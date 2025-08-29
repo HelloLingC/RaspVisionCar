@@ -1,16 +1,17 @@
 import cv2
 from cv2.mat_wrapper import Mat
 import numpy as np
+import light_detect
+import config
 
 def get_yellow_mask(frame):
-    # 转换到HSV颜色空间
+    # BGR to HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
-    # 定义黄色的HSV范围
+    # 黄色的HSV范围
     lower_yellow = np.array([10, 40, 120])
     upper_yellow = np.array([40, 255, 255])
-    
-    # 创建黄色掩膜
+
     mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
     dilate_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (10, 10))
@@ -18,11 +19,9 @@ def get_yellow_mask(frame):
     mask = cv2.medianBlur(mask, 9)  # 中值滤波
     mask = cv2.dilate(mask, dilate_kernel)  # 膨胀
     mask = cv2.erode(mask, erode_kernel)  # 腐蚀
-    
     return mask
 
 def find_track_line(image: Mat):
-    # ROI
     height, width = image.shape[:2]
     # 梯形ROI
     mask = np.zeros(image.shape[:2], dtype=np.uint8)
@@ -70,25 +69,22 @@ def mid(follow, mask):
 
 def handle_one_frame(frame: Mat):
     frame = cv2.resize(frame, (640, 480))
-    # 获取黄色掩膜
+
+    light_detect.handle_lights(frame)
+
     yellow_mask = get_yellow_mask(frame)
-    
-    # 查找赛道线
+
     track_line, pts = find_track_line(yellow_mask)
-    # 查找轮廓
+
     edges = cv2.Canny(track_line, 50, 150)
-    
+
     mask = edges != 0
     frame[mask] = [0, 0, 255]
 
     cv2.polylines(frame, [pts], isClosed=True, color=(255, 0, 55), thickness=1)
 
-    # h,w = edges.shape[:2]
-    # mid_line = w//2-1
-    # cv2.line(frame, (mid_line, 0), (mid_line, h), (0, 255, 255), 1)
-
     follow,error =mid(frame, edges)
-    cv2.putText(frame, f"Turn: {error}", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(155,55,0), 2)
+    cv2.putText(frame, f"Turn: {error}", (config.DEBUG_LEFT_MARGIN, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(155,55,0), 2)
 
     cv2.imshow("Original", frame)
     cv2.imshow("Track Line", yellow_mask)
@@ -106,9 +102,8 @@ def main():
         if not ret:
             break
 
-        # 处理当前帧
         handle_one_frame(frame)
-        
+
         # 按'q'退出
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -118,7 +113,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # frame = cv2.imread("test/2.jpg")
+    # frame = cv2.imread("test/4.jpg")
     # handle_one_frame(frame)
     # cv2.waitKey(0)
     #  cv2.destroyAllWindows()
