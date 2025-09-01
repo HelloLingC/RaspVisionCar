@@ -3,6 +3,12 @@ from cv2.mat_wrapper import Mat
 import numpy as np
 import light_detect
 import config
+import server
+import threading
+
+SCREEN_WIDTH = 640
+SCREEN_HEIGHT = 480
+ROI_TOP_VERT = 230
 
 def get_yellow_mask(frame):
     # BGR to HSV
@@ -27,7 +33,7 @@ def find_track_line(image: Mat):
     mask = np.zeros(image.shape[:2], dtype=np.uint8)
 
     # Define trapezoid points  左下 右下 右上 左上
-    pts = np.array([[0, height], [width-10, height], [width-50, 200], [100, 200]], np.int32)
+    pts = np.array([[0, height], [width-10, height], [width-80, ROI_TOP_VERT], [170, ROI_TOP_VERT]], np.int32)
     pts = pts.reshape((-1, 1, 2))
 
     # Fill the trapezoid area on mask
@@ -43,6 +49,8 @@ def mid(follow, mask):
     halfWidth= follow.shape[1] // 2
     half = halfWidth  # 从下往上扫描赛道,最下端取图片中线为分割线
     for y in range(follow.shape[0] - 1, -1, -1):
+        if SCREEN_HEIGHT - y > ROI_TOP_VERT + 20:
+            break
         # V2改动:加入分割线左右各半张图片的宽度作为约束,减小邻近赛道的干扰
         if (mask[y][max(0,half-halfWidth):half] == np.zeros_like(mask[y][max(0,half-halfWidth):half])).all():  # 分割线左端无赛道
             left = max(0,half-halfWidth)  # 取图片左边界
@@ -88,9 +96,11 @@ def handle_one_frame(frame: Mat):
 
     cv2.imshow("Original", frame)
     cv2.imshow("Track Line", yellow_mask)
-
+    server.output.write(yellow_mask)
 
 def main():
+    server.start_server()
+
     # cap = cv2.VideoCapture(0)
     # cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
     # cap.set(cv2.CAP_PROP_CONTRAST, 0.5)
