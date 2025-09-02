@@ -1,4 +1,6 @@
 /venv
 /test
 
+
 __pycache__
+/.vscode

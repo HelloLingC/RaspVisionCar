@@ -10,6 +10,8 @@ SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 ROI_TOP_VERT = 230
 
+FRAME_OUTPUT_METHOD = 2 # 0: Don't Output 1: Output for ControlPanel, 2: Output with cs2.imshow() 
+
 def get_yellow_mask(frame):
     # BGR to HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -76,8 +78,6 @@ def mid(follow, mask):
 
 
 def handle_one_frame(frame: Mat):
-    frame = cv2.resize(frame, (640, 480))
-
     light_detect.handle_lights(frame)
 
     yellow_mask = get_yellow_mask(frame)
@@ -94,29 +94,43 @@ def handle_one_frame(frame: Mat):
     follow,error =mid(frame, edges)
     cv2.putText(frame, f"Turn: {error}", (config.DEBUG_LEFT_MARGIN, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(155,55,0), 2)
 
-    cv2.imshow("Original", frame)
-    cv2.imshow("Track Line", yellow_mask)
-    server.output.write(yellow_mask)
+    
+    if(FRAME_OUTPUT_METHOD == 1):
+        encode_params = [cv2.IMWRITE_JPEG_QUALITY, 90]
+        success, jpeg_data = cv2.imencode('.jpeg', frame)
+        if success:
+            server.output.write(jpeg_data.tobytes())  
+    elif(FRAME_OUTPUT_METHOD == 2):
+        cv2.imshow("Original", frame)
+        cv2.imshow("Track Line", yellow_mask)
 
 def main():
-    server.start_server()
+    # 异步启动服务器
+    if(FRAME_OUTPUT_METHOD == 1):
+        server_thread = threading.Thread(target=server.start_server, daemon=True)
+        server_thread.start()
+        print("Control Server will be runing async")
 
     # cap = cv2.VideoCapture(0)
     # cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
     # cap.set(cv2.CAP_PROP_CONTRAST, 0.5)
+        # cap.set(cv2.CAP_PROP_SATURATION, 3)
     cap = cv2.VideoCapture("test/1.mp4")
-    # cap.set(cv2.CAP_PROP_SATURATION, 3)
+    # cap.set(cv2.CAP_PROP_FPS, 30)
+    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     
     while True:
         ret, frame = cap.read()
         if not ret:
             break
+        frame = cv2.resize(frame, (640, 480))
 
         handle_one_frame(frame)
 
         # 按'q'退出
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
     
     cap.release()
     cv2.destroyAllWindows()

@@ -1,12 +1,13 @@
-from http import server
-import cv2
+from flask import Flask, Response, request, send_file
 import time
 import threading
 import io
 import urllib
 
-html = """
-"""
+app = Flask(__name__)
+
+# Global variable for streaming output
+output = None
 
 class StreamingOutput(io.BufferedIOBase):
     def __init__(self):
@@ -18,79 +19,63 @@ class StreamingOutput(io.BufferedIOBase):
             self.frame = buf
             self.condition.notify_all()
 
-class ServerHandler(server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/':
-            content = html.encode()
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.send_header('Content-Length', len(content))
-            self.end_headers()
-            self.wfile.write(content)
-        elif self.path == '/control':
-            self.handle_control_request()
-        elif self.path == '/stream.mjpg':
-            self.send_response(200)
-            self.send_header('Age', 0)
-            self.send_header('Cache-Control', 'no-cache, private')
-            self.send_header('Pragma', 'no-cache')
-            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
-            self.end_headers()
-            
-            try:
-                cap = cv2.VideoCapture(0)
-                cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-                cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-                cap.set(cv2.CAP_PROP_FPS, 30)
+@app.route('/')
+def index():
+    try:
+        return send_file("server.html")
+    except FileNotFoundError:
+        return "HTML file not found", 404
+
+@app.route('/control')
+def control():
+    command = request.args.get('command', '')
+    speed = request.args.get('speed', '50')
+    
+    # Process your control commands here
+    print(f"Command: {command}, Speed: {speed}")
+    
+    response = Response('OK')
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+@app.route('/stream.mjpg')
+def stream():
+    def generate():
+        try:
+            while True:
+                with output.condition:
+                    output.condition.wait()
+                    frame = output.frame
                 
-                while True:
-                    with output.condition:
-                        output.condition.wait()
-                        frame = output.frame
-
-                    # 构建MJPEG帧
-                    self.wfile.write(b'--FRAME\r\n')
-                    self.send_header('Content-Type', 'image/jpeg')
-                    self.send_header('Content-Length', len(frame))
-                    self.end_headers()
-                    self.wfile.write(frame)
-                    self.wfile.write(b'\r\n')
-                    
-                    # 添加短暂延迟以控制帧率
-                    # time.sleep(0.033)  # 约30 FPS
-                    
-            except Exception as e:
-                print(f"Stream error: {e}")
-            finally:
-                if 'cap' in locals():
-                    cap.release()
-
-    def handle_control_request(self):
-        parsed_path = urllib.parse.urlparse(self.path)
-        query_params = urllib.parse.parse_qs(parsed_path.query)
-        command = query_params.get('command', [''])[0]
-        speed = query_params.get('speed', ['50'])[0]
-
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.end_headers()
-        self.wfile.write(b'OK')
-
-
-class Server(server.HTTPServer):
-    allow_reuse_address = True
-    daemon_threads = True 
+                if frame:
+                    # Build MJPEG frame
+                    yield (b'--FRAME\r\n'
+                           b'Content-Type: image/jpeg\r\n'
+                           b'Content-Length: ' + str(len(frame)).encode() + b'\r\n\r\n' +
+                           frame + b'\r\n')
+                
+                # Add delay to control frame rate if needed
+                # time.sleep(0.033)  # ~30 FPS
+                
+        except Exception as e:
+            print(f"Stream error: {e}")
+    
+    return Response(
+        generate(),
+        mimetype='multipart/x-mixed-replace; boundary=FRAME',
+        headers={
+            'Age': '0',
+            'Cache-Control': 'no-cache, private',
+            'Pragma': 'no-cache'
+        }
+    )
 
 def start_server():
-    global html
-    with open("server.html", encoding="utf-8") as f:
-        html = f.read()
+    global output
+    output = StreamingOutput()
+    
     print('Control Server started running on port 8080')
-    server = Server(('0.0.0.0', 8080), ServerHandler)
-    server.serve_forever()
-
-output = StreamingOutput()
+    app.run(host='0.0.0.0', port=8080, threaded=True)
 
 if __name__ == '__main__':
     start_server()
