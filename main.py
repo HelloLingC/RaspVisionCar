@@ -3,7 +3,7 @@ from cv2.mat_wrapper import Mat
 import numpy as np
 import light_detect
 import config
-import server
+import server.http_server as server
 import threading
 
 SCREEN_WIDTH = 640
@@ -11,6 +11,8 @@ SCREEN_HEIGHT = 480
 ROI_TOP_VERT = 230
 
 FRAME_OUTPUT_METHOD = 2 # 0: Don't Output 1: Output for ControlPanel, 2: Output with cs2.imshow() 
+
+UPTIME_START_WHEN = 0
 
 def get_yellow_mask(frame):
     # BGR to HSV
@@ -99,7 +101,7 @@ def handle_one_frame(frame: Mat):
         encode_params = [cv2.IMWRITE_JPEG_QUALITY, 90]
         success, jpeg_data = cv2.imencode('.jpeg', frame)
         if success:
-            server.output.write(jpeg_data.tobytes())  
+            server.output.write(jpeg_data.tobytes())
     elif(FRAME_OUTPUT_METHOD == 2):
         cv2.imshow("Original", frame)
         cv2.imshow("Track Line", yellow_mask)
@@ -129,8 +131,8 @@ def main():
         handle_one_frame(frame)
 
         # 按'q'退出
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     break
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
     
     cap.release()
     cv2.destroyAllWindows()

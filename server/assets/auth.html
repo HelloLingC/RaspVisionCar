@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisionCar Console</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f1621 0%, #1c2331 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(66, 139, 202, 0.1) 0%, transparent 80%);
+            z-index: -1;
+        }
+        
+        .login-container {
+            background: rgba(25, 30, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(0);
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(66, 139, 202, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 6s infinite;
+            z-index: -1;
+        }
+        
+        @keyframes shine {
+            0% {
+                left: -50%;
+            }
+            20% {
+                left: 100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+        
+        h1 {
+            font-weight: 600;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(66, 139, 202, 0.5);
+            letter-spacing: 1px;
+        }
+        
+        .strawberry {
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(35, 40, 52, 0.7);
+            border: 2px solid rgba(66, 139, 202, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            border-color: #428bca;
+            box-shadow: 0 0 15px rgba(66, 139, 202, 0.5);
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #428bca 0%, #2a6496 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #2a6496 0%, #428bca 100%);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        button:active {
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dashboard-preview {
+            margin-top: 40px;
+            width: 100%;
+            height: 120px;
+            background: rgba(15, 22, 33, 0.7);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dashboard-item {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .dashboard-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #428bca;
+            margin-bottom: 5px;
+        }
+        
+        .dashboard-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .pulse {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .dashboard-preview {
+                height: 100px;
+            }
+            
+            .dashboard-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1><span class="strawberry">🍓</span>RaspVisionCar Console</h1>
+        
+        <div class="input-group">
+            <input type="password" placeholder="Password" id="password">
+        </div>
+        
+        <button id="login-btn">Login</button>
+        
+        <div class="dashboard-preview">
+            <div class="dashboard-item">
+                <div class="dashboard-value">72%</div>
+                <div class="dashboard-label">Battery</div>
+            </div>
+            <div class="dashboard-item">
+                <div class="dashboard-value">26°C</div>
+                <div class="dashboard-label">Temperature</div>
+            </div>
+            <div class="dashboard-item">
+                <div class="dashboard-value"><span class="pulse"></span>Online</div>
+                <div class="dashboard-label">Status</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginBtn = document.getElementById('login-btn');
+            const passwordInput = document.getElementById('password');
+            
+            loginBtn.addEventListener('click', function() {
+                if(passwordInput.value === '') {
+                    // Add a subtle shake effect if password is empty
+                    passwordInput.style.animation = 'shake 0.5s';
+                    passwordInput.focus();
+                    setTimeout(() => {
+                        passwordInput.style.animation = '';
+                    }, 500);
+                    alert("Please enter the password")
+                } else {
+                    // Simulate login process
+                    loginBtn.textContent = 'Authenticating...';
+                    loginBtn.disabled = true;
+                    
+                    // In a real application, you would send a request to a server here
+                    setTimeout(() => {
+                        alert('Login successful! Redirecting to dashboard...');
+                        loginBtn.textContent = 'Login';
+                        loginBtn.disabled = false;
+                        passwordInput.value = '';
+                    }, 1500);
+                }
+            });
+            
+            // Allow login on pressing Enter key
+            passwordInput.addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') {
+                    loginBtn.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

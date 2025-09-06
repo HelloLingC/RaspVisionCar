@@ -1,10 +1,14 @@
+# HTTP Flask server for RaspVisionCar console
+# Provides web interface and static file serving
+
 from flask import Flask, Response, request, send_file
 import time
 import threading
 import io
-import urllib
 
 app = Flask(__name__)
+
+ASSETS_DIR = "assets"
 
 # Global variable for streaming output
 output = None
@@ -13,7 +17,7 @@ class StreamingOutput(io.BufferedIOBase):
     def __init__(self):
         self.frame = None
         self.condition = threading.Condition()
-    
+
     def write(self, buf):
         with self.condition:
             self.frame = buf
@@ -22,9 +26,23 @@ class StreamingOutput(io.BufferedIOBase):
 @app.route('/')
 def index():
     try:
-        return send_file("server.html")
+        return send_file(f"{ASSETS_DIR}/index.html")
     except FileNotFoundError:
         return "HTML file not found", 404
+
+@app.route('/auth')
+def auth():
+    try:
+        return send_file(f"{ASSETS_DIR}/auth.html")
+    except FileNotFoundError:
+        return "HTML file not found", 404
+
+@app.route('/main.js')
+def main_js():
+    try:
+        return send_file(f"{ASSETS_DIR}/main.js", mimetype='application/javascript')
+    except FileNotFoundError:
+        return "JavaScript file not found", 404
 
 @app.route('/control')
 def control():
@@ -32,7 +50,7 @@ def control():
     speed = request.args.get('speed', '50')
     
     # Process your control commands here
-    print(f"Command: {command}, Speed: {speed}")
+    print(f"HTTP Command: {command}, Speed: {speed}")
     
     response = Response('OK')
     response.headers['Access-Control-Allow-Origin'] = '*'
@@ -70,12 +88,14 @@ def stream():
         }
     )
 
-def start_server():
+def start_http_server(host='0.0.0.0', port=8080, debug=False):
+    """Start HTTP server"""
     global output
     output = StreamingOutput()
-    
-    print('Control Server started running on port 8080')
-    app.run(host='0.0.0.0', port=8080, threaded=True)
+
+    print(f'HTTP Server started running on {host}:{port}')
+    app.run(host=host, port=port, debug=debug, threaded=True)
+
 
 if __name__ == '__main__':
-    start_server()
+    start_http_server()

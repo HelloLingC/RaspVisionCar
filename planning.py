@@ -30,22 +30,22 @@ GPIO.setup(BIN1, GPIO.OUT)
 GPIO.setup(BIN2, GPIO.OUT)
 GPIO.setup(PWMB, GPIO.OUT)
 
-# 设置霍尔传感器引脚
+# 霍尔传感器引脚
 GPIO.setup(HALL_LEFT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(HALL_RIGHT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# 创建PWM对象，频率设置为1000Hz
+# PWM，频率1000Hz
 pwm_a = GPIO.PWM(PWMA, 1000)
 pwm_b = GPIO.PWM(PWMB, 1000)
 pwm_a.start(0)
 pwm_b.start(0)
 
 # PID参数
-KP = 0.8    # 比例系数
-KI = 0.2    # 积分系数
-KD = 0.1    # 微分系数
+KP = 0.8
+KI = 0.2
+KD = 0.1
 
-# 全局变量
+# Global
 left_counter = 0      # 左侧霍尔计数器
 right_counter = 0     # 右侧霍尔计数器
 left_rpm = 0          # 左侧转速
@@ -65,7 +65,7 @@ def hall_right_callback(channel):
     global right_counter
     right_counter += 1
 
-# 添加中断检测
+# Hall Effect 中断检测
 GPIO.add_event_detect(HALL_LEFT, GPIO.FALLING, callback=hall_left_callback, bouncetime=2)
 GPIO.add_event_detect(HALL_RIGHT, GPIO.FALLING, callback=hall_right_callback, bouncetime=2)
 
