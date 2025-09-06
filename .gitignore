@@ -8,7 +8,6 @@ __pycache__
 /node_modules
 /dist
 /build
-/docs
 /assets
 /logs
 /tmp
