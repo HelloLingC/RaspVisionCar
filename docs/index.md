@@ -4,15 +4,15 @@ layout: home
 
 hero:
   name: "RaspVisionCar"
-  text: "A VitePress Site"
-  tagline: My great project tagline
+  text: "视觉智能车"
+  tagline: Raspberry Pi Powered
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: 开始
+      link: /prologue
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: Github
+      link: https://github.com/HelloLingC/RaspVisionCar/
 
 features:
   - title: Feature A

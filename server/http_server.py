@@ -46,7 +46,7 @@ def main_js():
 
 @app.route('/control')
 def control():
-    command = request.args.get('command', '')
+    command = request.args.gjkjet('command', '')
     speed = request.args.get('speed', '50')
     
     # Process your control commands here

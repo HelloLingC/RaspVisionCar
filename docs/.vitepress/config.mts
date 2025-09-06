@@ -8,16 +8,29 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/raspberry' }
+      { text: 'Examples', link: '/prologue '}
     ],
 
     sidebar: [
       {
-        text: 'Examples',
+        text: '快速开始',
         items: [
-          { text: 'Raspberry', link: '/raspberry' },
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
+          { text: '简介', link: '/prologue' },
+          { text: '硬件清单', link: '/hardware-list' },
+          { text: '树莓派配置', link: '/quick-start/raspi' },
+          { text: 'STM32配置', link: '/quick-start/stm32' },
+        ]
+      },
+      {
+        text: '决策系统',
+        items: [
+          { text: '树莓派USART通信', link: '/guide/usart' },
+        ]
+      }, 
+      {
+        text: '下位控制',
+        items: [
+          { text: 'Motor', link: '/guide/motor' },
         ]
       }
     ],

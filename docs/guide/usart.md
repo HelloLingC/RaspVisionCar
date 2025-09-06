@@ -1,12 +1,16 @@
-# 树莓派配置
+---
+title: 树莓派USART通信
+editLink: true
+---
 
-## 串口通信 UARTS
 
-在树莓派5中， /dev/serial0 is a symbolic link that points to /dev/ttyAMA10
+# 串口通信 UARTS
+
+在树莓派5中， /dev/serial0 是指向 /dev/ttyAMA10 的符号链接。
 
 将树莓派的两个引脚 GPIO14(TXD), GPIO15(RXD) 与 STM32 的 PA10(USART1_RX), PA9(USART_TX)相连。
 
-/dev/ttyAMA0
+我们要与下位机通信，则至需要关注串口 /dev/ttyAMA0
 
 更多信息，请查阅[官方文档](https://www.raspberrypi.com/documentation/computers/configuration.html#configure-uarts)
 
@@ -36,7 +40,7 @@ sudo minicom -s
 选择 "Exit" 开始通信。
 ```
 
-### STM32 与树莓派通信协议
+## STM32 与树莓派通信协议
 
 不使用二进制协议。JSON结构体
 
@@ -44,7 +48,6 @@ sudo minicom -s
 
 | 字段      | 说明         |
 |-----------|--------------|
-| Prefix    | 帧前缀       |
 | Command   | 命令字节     |
 | Data      | 数据内容     |
 
@@ -54,6 +57,7 @@ sudo minicom -s
 ```
 CMD:{"cmd": "MF", "timestamp": 1234567890.123, "params": {"direction": "forward", "speed": 50}}
 ```
+
 #### Command（命令）
 
 | 命令码  | 功能描述                    | 参数  |
@@ -68,4 +72,11 @@ CMD:{"cmd": "MF", "timestamp": 1234567890.123, "params": {"direction": "forward"
 - 正常应答: `ACK:{"status": "ok", "data": {...}}`
 - 错误应答: `ERR:error_messgae`
 
+### 客户端主动上报
+
+#### 命令格式
+
+```
+DTP:{"type": "MF", "params": {"direction": "forward", "speed": 50}}
+```
 
