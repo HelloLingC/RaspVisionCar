@@ -4,3 +4,14 @@
 
 __pycache__
 /.vscode
+
+/node_modules
+/dist
+/build
+/docs
+/assets
+/logs
+/tmp
+/cache
+/backup
+/config
