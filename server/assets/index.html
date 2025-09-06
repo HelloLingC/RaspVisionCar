@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能小车控制面板</title>
+    <title>RaspVisionCar Console</title>
     <style>
         * {
             margin: 0;
@@ -227,7 +227,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>VisionCar Control Panel</h1>
+            <h1>RaspVisionCar Console</h1>
             <p>Real-time</p>
         </div>
         
@@ -237,15 +237,15 @@
                 <div class="status-value" id="connection-status">已连接</div>
             </div>
             <div class="status-item">
-                <div class="status-label">电池电量</div>
+                <div class="status-label">Angle</div>
                 <div class="status-value" id="battery-level">85%</div>
             </div>
             <div class="status-item">
-                <div class="status-label">当前速度</div>
+                <div class="status-label">Speed</div>
                 <div class="status-value" id="current-speed">0 km/h</div>
             </div>
             <div class="status-item">
-                <div class="status-label">运行时间</div>
+                <div class="status-label">Uptime</div>
                 <div class="status-value" id="uptime">00:12:34</div>
             </div>
         </div>
@@ -288,7 +288,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <!-- <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script> -->
     <script src="main.js"></script>
 </body>
 </html>

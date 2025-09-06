@@ -1,5 +1,5 @@
 # HTTP Flask server for RaspVisionCar console
-# Provides web interface and static file serving
+# should be running on Raspberry Pi
 
 from flask import Flask, Response, request, send_file
 import time
@@ -54,6 +54,7 @@ def control():
     
     response = Response('OK')
     response.headers['Access-Control-Allow-Origin'] = '*'
+    
     return response
 
 @app.route('/stream.mjpg')
