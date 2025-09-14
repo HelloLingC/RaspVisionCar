@@ -1,0 +1,54 @@
+flowchart TD
+    subgraph S1 [感知层 Sensor Layer]
+        direction LR
+        Lidar[LD14 激光雷达<br>Lidar]
+        Camera[摄像头<br>Camera]
+        A3[姿态传感器<br>IMU]
+        A4[霍尔编码器<br>Hall Encoders]
+    end
+
+    subgraph S2 [决策层 Decision Layer]
+        Raspi[树莓派<br>Ubuntu 18系统]
+        ROS[ROS<br>中间件]
+        Cartographer[Cartographer<br>SLAM建图]
+        OpenCV[视觉模块<br>OpenCV]
+        RaspiCOM[树莓派远程串口<br>Minicom]
+    end
+
+
+    subgraph Outer [扩展资源 External Res]
+        Server[控制平台<br>Console]
+        GraphicCard[AI推理芯片]
+    end
+
+    subgraph S3 [执行层 Execution Layer]
+        direction LR
+        STM[STM32]
+        FF[前馈控制器<br>Feed-forward Control]
+        PID[反馈控制器 PID<br>Feedback Control]
+        D[H桥电机驱动板]
+    end
+
+    subgraph S4 [控制层]
+        direction LR
+        Motor[电机]
+        OLED[OLED屏幕]
+    end
+
+    %% 数据流向
+
+    S2 -- 控制指令--> S3
+
+    S3 -- 控制层状态 --> S2
+
+    A3 -- 陀螺仪/加速度<br>USART通信 --> STM
+
+    S3 -- PWM --> Motor
+
+    STM -- I2C --> OLED
+
+    Camera -- 视频流<br>USB/UVC --> S2
+
+    Lidar -- 点云数据<br>USART通信 --> S2
+
+    Outer -- 远程通信<br>TCP --> RaspiCOM

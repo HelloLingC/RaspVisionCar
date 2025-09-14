@@ -9,30 +9,39 @@ https://github.com/HelloLingC/RaspVisionCar-STM32
 
 ## Motor
 
-### Engine
+### PWM
 
 PA6 TIM3_CH1 ->  Motor PWMA
+
 PA7 TIM3_CH2 ->  Motor PWMB
 
-STBY ->
+PC15 - STBY
+
+### Left Motor Driver
 
 PB0 -> AIN1
 
 PB1 -> AIN2
 
+### Right Motor Driver
+
 PA4 -> BIN1
 
 PA5 -> BIN2
 
-### Hall Encoder
+## Hall Encoder
 
-E2B TIM2
+### Left Encoder
 
-E2A
+E1A -> TIM2_CH1 PB6
 
-E1B
+E1B -> TIM2_CH2 PB7
 
-E1A TIM4
+### Right Encoder
+
+E2A -> TIM4_CH1
+
+E2B -> TIM4_CH2
 
 GND
 
@@ -40,9 +49,9 @@ GND
 
 # Raspberry Pi
 
-PA9  USART_1 TX -> GPIO
+PA9  USART_1 TX -> GPIO 15 RX
 
-PA10 USART_1 RX -> GPIO
+PA10 USART_1 RX -> GPIO 14 TX
 
 
 # Lader

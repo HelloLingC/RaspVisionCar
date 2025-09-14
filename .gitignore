@@ -1,13 +1,15 @@
 /venv
 /test
 
-
 __pycache__
-/.vscode
+**/*/__pycache__
 
+/.vscode
 /node_modules
 /dist
+**/*/dist
+/cache
+**/*/cache
 /build
 /logs
 /tmp
-/cache

@@ -4,6 +4,8 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "RaspVisionCar",
   description: "A VitePress Site",
+  base: '/',
+  srcDir: './docs',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [

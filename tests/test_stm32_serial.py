@@ -12,43 +12,41 @@ import time
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
-from gpio.serial import init_stm32_controller, get_stm32_controller, cleanup_stm32_controller
+from gpio.serial_io import init_stm32_io, get_stm32_io, cleanup_stm32_io
+from gpio.motor import Motor_Controller
 
 def test_basic_commands():
     """测试基本命令"""
     print("=== 测试基本命令 ===")
     
-    controller = get_stm32_controller()
-    if not controller:
-        print("错误: STM32控制器未初始化")
-        return False
+    controller = Motor_Controller()
     
     # 测试获取状态
     print("1. 测试获取状态...")
-    result = controller.get_status()
+    result = controller.get_sensor_data()
     print(f"   结果: {result}")
     
     # 测试小车移动
     print("2. 测试小车前进...")
-    result = controller.move_car('forward', 50)
+    result = controller.move_car(speed=50, angle=0)
     print(f"   结果: {result}")
     time.sleep(2)
     
     # 测试停止
     print("3. 测试停止...")
-    result = controller.move_car('stop', 0)
+    result = controller.move_car(0, 0)
     print(f"   结果: {result}")
     time.sleep(1)
     
     # 测试左转
     print("4. 测试左转...")
-    result = controller.move_car('left', 30)
+    result = controller.move_car(30, 0)
     print(f"   结果: {result}")
     time.sleep(2)
     
     # 测试停止
     print("5. 测试停止...")
-    result = controller.move_car('stop', 0)
+    result = controller.move_car(0, 0)
     print(f"   结果: {result}")
     
     return True
@@ -57,7 +55,7 @@ def test_motor_control():
     """测试电机控制"""
     print("\n=== 测试电机控制 ===")
     
-    controller = get_stm32_controller()
+    controller = get_stm32_io()
     if not controller:
         print("错误: STM32控制器未初始化")
         return False
@@ -83,7 +81,7 @@ def test_led_control():
     """测试LED控制"""
     print("\n=== 测试LED控制 ===")
     
-    controller = get_stm32_controller()
+    controller = get_stm32_io()
     if not controller:
         print("错误: STM32控制器未初始化")
         return False
@@ -104,7 +102,7 @@ def test_sensor_data():
     """测试传感器数据获取"""
     print("\n=== 测试传感器数据 ===")
     
-    controller = get_stm32_controller()
+    controller = get_stm32_io()
     if not controller:
         print("错误: STM32控制器未初始化")
         return False
@@ -120,7 +118,7 @@ def test_emergency_stop():
     """测试紧急停止"""
     print("\n=== 测试紧急停止 ===")
     
-    controller = get_stm32_controller()
+    controller = get_stm32_io()
     if not controller:
         print("错误: STM32控制器未初始化")
         return False
@@ -136,7 +134,7 @@ def show_statistics():
     """显示统计信息"""
     print("\n=== 统计信息 ===")
     
-    controller = get_stm32_controller()
+    controller = get_stm32_io()
     if not controller:
         print("错误: STM32控制器未初始化")
         return
@@ -157,7 +155,7 @@ def main():
     
     # 初始化STM32控制器
     print("正在初始化STM32控制器...")
-    if not init_stm32_controller():
+    if not init_stm32_io():
         print("错误: STM32控制器初始化失败")
         print("请检查:")
         print("1. STM32设备是否已连接")
@@ -186,7 +184,7 @@ def main():
         print(f"\n测试过程中出现错误: {e}")
     finally:
         # 清理资源
-        cleanup_stm32_controller()
+        cleanup_stm32_io()
         print("STM32控制器资源已清理")
 
 if __name__ == '__main__':
