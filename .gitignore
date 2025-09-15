@@ -13,3 +13,7 @@ __pycache__
 /build
 /logs
 /tmp
+
+docs/.vitepress/cache
+docs/.vitepress/cache/deps
+docs/.vitepress/dist
