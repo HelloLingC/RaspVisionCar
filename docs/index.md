@@ -15,11 +15,11 @@ hero:
       link: https://github.com/HelloLingC/RaspVisionCar/
 
 features:
-  - title: Feature A
+  - title: 视觉处理
+    details: 基于 OpenCV 实现车道线识别、交通标志检测、颜色跟踪等多种计算机视觉任务
+  - title: 环境感知
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: 协同控制与决策
+    details: Pi与STM32的分工协作
 ---
 
