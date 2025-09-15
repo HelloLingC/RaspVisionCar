@@ -4,8 +4,9 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "RaspVisionCar",
   description: "视觉智能车",
+  lastUpdated: true,
   themeConfig: {
-    logo: './images/logo.svg',
+    logo: '/logo.svg',
     nav: [
       { text: 'Home', link: '/' },
       { text: '简介', link: '/prologue '}
@@ -31,12 +32,17 @@ export default defineConfig({
         text: '下位控制',
         items: [
           { text: 'Motor', link: '/guide/motor' },
-        ]
+        ] 
       }
     ],
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/HelloLingC/RaspVisionCar' }
-    ]
+    ],
+
+    footer: {
+      message: 'Released under the MIT License.',
+      copyright: 'Copyright © 2025-present LingC'
+    }
   }
 })
