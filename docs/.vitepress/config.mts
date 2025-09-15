@@ -3,21 +3,19 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "RaspVisionCar",
-  description: "A VitePress Site",
-  // base: '/',
-  // srcDir: './docs',
+  description: "视觉智能车",
   themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
+    logo: './images/logo.svg',
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/prologue '}
+      { text: '简介', link: '/prologue '}
     ],
 
     sidebar: [
       {
         text: '快速开始',
         items: [
-          { text: '简介', link: '/prologue' },
+          { text: '快速开始', link: '/prologue' },
           { text: '硬件清单', link: '/hardware-list' },
           { text: '树莓派配置', link: '/quick-start/raspi' },
           { text: 'STM32配置', link: '/quick-start/stm32' },
