@@ -10,7 +10,7 @@ SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 ROI_TOP_VERT = 230
 
-FRAME_OUTPUT_METHOD = 2 # 0: Don't Output 1: Output for ControlPanel, 2: Output with cs2.imshow() 
+FRAME_OUTPUT_METHOD = 1 # 0: Don't Output 1: Output for ControlPanel, 2: Output with cs2.imshow() 
 
 UPTIME_START_WHEN = 0
 
