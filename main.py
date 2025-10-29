@@ -109,7 +109,7 @@ def handle_one_frame(frame: Mat):
 def main():
     # 异步启动服务器
     if(FRAME_OUTPUT_METHOD == 1):
-        server_thread = threading.Thread(target=server.start_server, daemon=True)
+        server_thread = threading.Thread(target=server.start_http_server, daemon=True)
         server_thread.start()
         print("Control Server will be runing async")
 
