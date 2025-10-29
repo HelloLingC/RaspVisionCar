@@ -113,14 +113,14 @@ def main():
         server_thread.start()
         print("Control Server will be runing async")
 
-    # cap = cv2.VideoCapture(0)
-    # cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
+    cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
     # cap.set(cv2.CAP_PROP_CONTRAST, 0.5)
         # cap.set(cv2.CAP_PROP_SATURATION, 3)
-    cap = cv2.VideoCapture("test/1.mp4")
+    # cap = cv2.VideoCapture("test/1.mp4")
     # cap.set(cv2.CAP_PROP_FPS, 30)
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     
     while True:
         ret, frame = cap.read()
@@ -139,7 +139,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # frame = cv2.imread("test/4.jpg")
-    # handle_one_frame(frame)
-    # cv2.waitKey(0)
-    #  cv2.destroyAllWindows()
