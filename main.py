@@ -80,7 +80,8 @@ def mid(follow, mask):
 
 
 def handle_one_frame(frame: Mat):
-    light_detect.handle_lights(frame)
+    # TODO: Add light detection
+    # light_detect.handle_lights(frame)
 
     yellow_mask = get_yellow_mask(frame)
 
