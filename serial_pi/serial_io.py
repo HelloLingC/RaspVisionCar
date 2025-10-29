@@ -53,10 +53,9 @@ class STM32SerialIO:
         self.data_callbacks: List[Callable[[SerialData], None]] = []
         
         # 协议配置
-        self.command_prefix = "CMD:"
         self.response_prefix = "ACK:"
         self.error_prefix = "ERR:"
-        self.data_prefix = "DTP:"
+        self.data_prefix = "DTP"
         
         # 统计信息
         self.stats = {
@@ -239,36 +238,7 @@ class STM32SerialIO:
             
             # 尝试解析数据
             data_str = data.decode('utf-8')
-            
-            # 根据前缀分类数据
-            if data_str.startswith(self.response_prefix):
-                serial_data.data_type = "response"
-                try:
-                    response_data = data_str[len(self.response_prefix):]
-                    serial_data.parsed_data = json.loads(response_data)
-                except json.JSONDecodeError:
-                    serial_data.parsed_data = response_data
-                self.stats['responses_received'] += 1
-                
-            elif data_str.startswith(self.error_prefix):
-                serial_data.data_type = "error"
-                serial_data.parsed_data = data_str[len(self.error_prefix):]
-                self.stats['errors'] += 1
-                
-            elif data_str.startswith(self.data_prefix):
-                serial_data.data_type = "sensor_data"
-                try:
-                    sensor_data = data_str[len(self.data_prefix):]
-                    serial_data.parsed_data = json.loads(sensor_data)
-                except json.JSONDecodeError:
-                    serial_data.parsed_data = sensor_data
-                self.stats['data_received'] += 1
-                
-            else:
-                # 普通数据
-                serial_data.data_type = "raw_data"
-                serial_data.parsed_data = data_str
-                self.stats['data_received'] += 1
+            print(f"收到数据: {data_str}")
             
             # 添加到队列
             try:
@@ -408,7 +378,7 @@ class STM32SerialIO:
             测试是否成功
         """
         try:
-            test_cmd = f"{self.command_prefix}PING\n"
+            test_cmd = "PING"
             response = self._send_raw_command(test_cmd, expect_response=True)
             return response is not None
         except:
@@ -417,18 +387,18 @@ class STM32SerialIO:
     def _send_raw_command(self, command: str, expect_response: bool = False) -> Optional[str]:
         """
         发送原始命令到STM32
-        
+
         Args:
             command: 要发送的命令
             expect_response: 是否期望响应
-            
+
         Returns:
             响应内容，如果没有响应或出错返回None
         """
         if not self.connected or not self.serial_conn:
             logger.error("串口未连接")
             return None
-        
+
         with self.lock:
             try:
                 # 发送命令
@@ -440,7 +410,7 @@ class STM32SerialIO:
                 self.stats['bytes_sent'] += len(command_bytes)
                 self.stats['last_command_time'] = time.time()
                 logger.debug(f"发送命令: {command.strip()}")
-                
+
                 if expect_response:
                     # 等待响应
                     start_time = time.time()
@@ -456,53 +426,12 @@ class STM32SerialIO:
                 logger.error(f"发送命令失败: {e}")
                 self.stats['errors'] += 1
                 return None
-    
+
     def send_command(self, command: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
-        发送结构化命令到STM32
-        
-        Args:
-            command: 命令名称
-            params: 命令参数
-            
-        Returns:
-            包含执行结果的字典
         """
-        try:
-            # 构建命令
-            cmd_data = {
-                'cmd': command,
-                'timestamp': time.time(),
-                'params': params or {}
-            }
-            
-            cmd_str = f"{self.command_prefix}{json.dumps(cmd_data)}\n"
-            
-            # 发送命令
-            response = self._send_raw_command(cmd_str, expect_response=True)
-            
-            if response:
-                return {
-                    'success': True,
-                    'data': response,
-                    'raw_response': str(response)
-                }
-            else:
-                return {
-                    'success': False,
-                    'error': 'No response from STM32',
-                    'raw_response': None
-                }
-                
-        except Exception as e:
-            logger.error(f"发送命令时出错: {e}")
-            return {
-                'success': False,
-                'error': str(e),
-                'raw_response': None
-            }
-    
-    
+        return self._send_raw_command(command, expect_response=True)
+
     def get_status(self) -> Dict[str, Any]:
         """
         获取STM32状态

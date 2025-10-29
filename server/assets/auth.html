@@ -266,11 +266,10 @@
                     
                     // In a real application, you would send a request to a server here
                     setTimeout(() => {
-                        alert('Login successful! Redirecting to dashboard...');
-                        loginBtn.textContent = 'Login';
+                        window.location.href = '/dashboard';
                         loginBtn.disabled = false;
                         passwordInput.value = '';
-                    }, 1500);
+                    }, 100);
                 }
             });
             

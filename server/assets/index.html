@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -18,7 +19,7 @@
             padding: 20px;
             color: #333;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -27,19 +28,21 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
-        
+
         .header {
-            background: linear-gradient(90deg, #4CAF50, #45a049);
+            background: #0b1020;
             color: white;
             padding: 20px;
             text-align: center;
         }
-        
+
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
+
+            font-weight: 700;
         }
-        
+
         .status-bar {
             background: #f8f9fa;
             padding: 15px;
@@ -48,7 +51,7 @@
             align-items: center;
             border-bottom: 2px solid #e9ecef;
         }
-        
+
         .status-item {
             text-align: center;
             padding: 10px 20px;
@@ -56,33 +59,34 @@
             background: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         .status-value {
             font-size: 1.2em;
             font-weight: bold;
             color: #4CAF50;
         }
-        
+
         .status-label {
             font-size: 0.9em;
             color: #666;
             margin-bottom: 5px;
         }
-        
+
         .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             padding: 20px;
         }
-        
-        .video-section, .control-section {
+
+        .video-section,
+        .control-section {
             background: white;
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         .video-feed {
             width: 100%;
             height: 360px;
@@ -90,17 +94,17 @@
             border-radius: 10px;
             overflow: hidden;
         }
-        
+
         .video-feed img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
+
         .control-panel {
             text-align: center;
         }
-        
+
         .d-pad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -109,7 +113,7 @@
             margin: 30px auto;
             max-width: 300px;
         }
-        
+
         .control-btn {
             padding: 20px;
             border: none;
@@ -121,28 +125,43 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        
+
         .control-btn:hover {
             background: #45a049;
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
-        
+
         .control-btn:active {
             transform: translateY(0);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-        
-        .btn-up { grid-area: 1 / 2 / 2 / 3; }
-        .btn-left { grid-area: 2 / 1 / 3 / 2; }
-        .btn-right { grid-area: 2 / 3 / 3 / 4; }
-        .btn-down { grid-area: 3 / 2 / 4 / 3; }
-        .btn-center { grid-area: 2 / 2 / 3 / 3; background: #ff6b6b; }
-        
+
+        .btn-up {
+            grid-area: 1 / 2 / 2 / 3;
+        }
+
+        .btn-left {
+            grid-area: 2 / 1 / 3 / 2;
+        }
+
+        .btn-right {
+            grid-area: 2 / 3 / 3 / 4;
+        }
+
+        .btn-down {
+            grid-area: 3 / 2 / 4 / 3;
+        }
+
+        .btn-center {
+            grid-area: 2 / 2 / 3 / 3;
+            background: #ff6b6b;
+        }
+
         .speed-control {
             margin: 20px 0;
         }
-        
+
         .speed-slider {
             width: 100%;
             height: 10px;
@@ -152,7 +171,7 @@
             outline: none;
             border-radius: 5px;
         }
-        
+
         .speed-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -162,14 +181,14 @@
             background: #4CAF50;
             cursor: pointer;
         }
-        
+
         .action-buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin-top: 20px;
         }
-        
+
         .action-btn {
             padding: 15px 25px;
             border: none;
@@ -179,27 +198,27 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .btn-start {
             background: #28a745;
             color: white;
         }
-        
+
         .btn-stop {
             background: #dc3545;
             color: white;
         }
-        
+
         .btn-emergency {
             background: #ffc107;
             color: white;
         }
-        
+
         .action-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        
+
         .footer {
             background: #343a40;
             color: white;
@@ -207,30 +226,194 @@
             padding: 15px;
             font-size: 0.9em;
         }
-        
+
+        /* PID控制样式 */
+        .pid-control {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #dee2e6;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .pid-control h3 {
+            color: #495057;
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+
+        .pid-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+
+        .pid-section h4 {
+            color: #6c757d;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .pid-section h4::before {
+            content: "⚙️";
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        .pid-params {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .pid-param {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .pid-param:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pid-param label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .pid-param input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #dee2e6 0%, #4CAF50 100%);
+            outline: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .pid-param input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .pid-param input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .pid-param input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .pid-param span {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 1.1em;
+            text-align: center;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            min-width: 50px;
+            display: inline-block;
+        }
+
+        .pid-actions {
+            margin-top: 25px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 2px solid #dee2e6;
+        }
+
+        .pid-actions .action-btn {
+            padding: 12px 25px;
+            margin: 0 8px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .pid-actions .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .pid-actions .action-btn:active {
+            transform: translateY(0);
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
             }
-            
+
             .status-bar {
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .status-item {
                 width: 100%;
+            }
+
+            .pid-params {
+                grid-template-columns: 1fr;
+            }
+
+            .pid-actions .action-btn {
+                display: block;
+                width: 100%;
+                margin: 8px 0;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
             <h1>RaspVisionCar Console</h1>
             <p>Real-time</p>
         </div>
-        
+
         <div class="status-bar">
             <div class="status-item">
                 <div class="status-label">连接状态</div>
@@ -249,15 +432,16 @@
                 <div class="status-value" id="uptime">00:12:34</div>
             </div>
         </div>
-        
+
         <div class="main-content">
             <div class="video-section">
                 <h2>Video Streaming</h2>
                 <div class="video-feed">
-                    <img src="stream.mjpg" alt="小车实时视频" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgdmlld0JveD0iMCAwIDY0MCA0ODAiIGZpbGw9IiMzMzMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRleHQgeD0iMzIwIiB5PSIyNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiPua1i+ivleWbvueJh+WumOe9rjwvdGV4dD48L3N2Zz4='">
+                    <img src="stream.mjpg" alt="小车实时视频"
+                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgdmlld0JveD0iMCAwIDY0MCA0ODAiIGZpbGw9IiMzMzMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRleHQgeD0iMzIwIiB5PSIyNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiPua1i+ivleWbvueJh+WumOe9rjwvdGV4dD48L3N2Zz4='">
                 </div>
             </div>
-            
+
             <div class="control-section">
                 <h2>Control</h2>
                 <div class="control-panel">
@@ -268,12 +452,13 @@
                         <button class="control-btn btn-right" onclick="move('right')">→</button>
                         <button class="control-btn btn-down" onclick="move('backward')">↓</button>
                     </div>
-                    
+
                     <div class="speed-control">
                         <h3>速度控制: <span id="speed-value">50%</span></h3>
-                        <input type="range" class="speed-slider" id="speed-slider" min="0" max="100" value="50" oninput="updateSpeed(this.value)">
+                        <input type="range" class="speed-slider" id="speed-slider" min="0" max="100" value="50"
+                            oninput="updateSpeed(this.value)">
                     </div>
-                    
+
                     <div class="action-buttons">
                         <button class="action-btn btn-start" onclick="startCar()">启动</button>
                         <button class="action-btn btn-stop" onclick="stopCar()">停止</button>
@@ -281,8 +466,66 @@
                     </div>
                 </div>
             </div>
+
+            <!-- PID参数调整区域 -->
+            <div class="pid-control">
+                <h3>PID参数调整</h3>
+
+                <div class="pid-section">
+                    <h4>方向控制PID</h4>
+                    <div class="pid-params">
+                        <div class="pid-param">
+                            <label>Kp (比例):</label>
+                            <input type="range" id="direction-kp" min="0" max="10" step="0.1" value="1.0"
+                                oninput="updatePidParam('direction', 'kp', this.value)">
+                            <span id="direction-kp-value">1.0</span>
+                        </div>
+                        <div class="pid-param">
+                            <label>Ki (积分):</label>
+                            <input type="range" id="direction-ki" min="0" max="5" step="0.1" value="0.1"
+                                oninput="updatePidParam('direction', 'ki', this.value)">
+                            <span id="direction-ki-value">0.1</span>
+                        </div>
+                        <div class="pid-param">
+                            <label>Kd (微分):</label>
+                            <input type="range" id="direction-kd" min="0" max="5" step="0.1" value="0.1"
+                                oninput="updatePidParam('direction', 'kd', this.value)">
+                            <span id="direction-kd-value">0.1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pid-section">
+                    <h4>速度控制PID</h4>
+                    <div class="pid-params">
+                        <div class="pid-param">
+                            <label>Kp (比例):</label>
+                            <input type="range" id="speed-kp" min="0" max="10" step="0.1" value="1.0"
+                                oninput="updatePidParam('speed', 'kp', this.value)">
+                            <span id="speed-kp-value">1.0</span>
+                        </div>
+                        <div class="pid-param">
+                            <label>Ki (积分):</label>
+                            <input type="range" id="speed-ki" min="0" max="5" step="0.1" value="0.1"
+                                oninput="updatePidParam('speed', 'ki', this.value)">
+                            <span id="speed-ki-value">0.1</span>
+                        </div>
+                        <div class="pid-param">
+                            <label>Kd (微分):</label>
+                            <input type="range" id="speed-kd" min="0" max="5" step="0.1" value="0.1"
+                                oninput="updatePidParam('speed', 'kd', this.value)">
+                            <span id="speed-kd-value">0.1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pid-actions">
+                    <button class="action-btn" style="background: #17a2b8;" onclick="applyPidParams()">应用PID参数</button>
+                    <button class="action-btn" style="background: #6c757d;" onclick="resetPidParams()">重置默认值</button>
+                </div>
+            </div>
         </div>
-        
+
         <div class="footer">
             <p>© 2025 VisionCar System | Ver 1.0.0</p>
         </div>
@@ -291,4 +534,5 @@
     <!-- <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script> -->
     <script src="main.js"></script>
 </body>
+
 </html>

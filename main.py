@@ -5,6 +5,7 @@ import light_detect
 import config
 import server.http_server as server
 import threading
+import serial_pi.serial_io as serial_io
 
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
@@ -110,9 +111,14 @@ def handle_one_frame(frame: Mat):
 def main():
     # 异步启动服务器
     if(FRAME_OUTPUT_METHOD == 1):
+        if not serial_io.init_stm32_io():
+            print("STM32 Serial IO initialization failed")
+            exit(1)
+        print("STM32 Serial IO initialized")
+
         server_thread = threading.Thread(target=server.start_http_server, daemon=True)
         server_thread.start()
-        print("Control Server will be runing async")
+        print("Console Server will be running asynchronously")
 
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)

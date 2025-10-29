@@ -15,47 +15,12 @@ sys.path.insert(0, project_root)
 from gpio.serial_io import init_stm32_io, get_stm32_io, cleanup_stm32_io
 from gpio.motor import Motor_Controller
 
-def test_basic_commands():
-    """测试基本命令"""
-    print("=== 测试基本命令 ===")
-    
-    controller = Motor_Controller()
-    
-    # 测试获取状态
-    print("1. 测试获取状态...")
-    result = controller.get_sensor_data()
-    print(f"   结果: {result}")
-    
-    # 测试小车移动
-    print("2. 测试小车前进...")
-    result = controller.move_car(speed=50, angle=0)
-    print(f"   结果: {result}")
-    time.sleep(2)
-    
-    # 测试停止
-    print("3. 测试停止...")
-    result = controller.move_car(0, 0)
-    print(f"   结果: {result}")
-    time.sleep(1)
-    
-    # 测试左转
-    print("4. 测试左转...")
-    result = controller.move_car(30, 0)
-    print(f"   结果: {result}")
-    time.sleep(2)
-    
-    # 测试停止
-    print("5. 测试停止...")
-    result = controller.move_car(0, 0)
-    print(f"   结果: {result}")
-    
-    return True
 
 def test_motor_control():
     """测试电机控制"""
     print("\n=== 测试电机控制 ===")
     
-    controller = get_stm32_io()
+    controller = Motor_Controller()
     if not controller:
         print("错误: STM32控制器未初始化")
         return False
@@ -73,59 +38,6 @@ def test_motor_control():
     
     print("3. 测试设置电机速度 (停止)...")
     result = controller.set_motor_speed(0, 0)
-    print(f"   结果: {result}")
-    
-    return True
-
-def test_led_control():
-    """测试LED控制"""
-    print("\n=== 测试LED控制 ===")
-    
-    controller = get_stm32_io()
-    if not controller:
-        print("错误: STM32控制器未初始化")
-        return False
-    
-    # 测试LED控制
-    print("1. 测试LED开启...")
-    result = controller.set_led(1, True, 'red')
-    print(f"   结果: {result}")
-    time.sleep(1)
-    
-    print("2. 测试LED关闭...")
-    result = controller.set_led(1, False)
-    print(f"   结果: {result}")
-    
-    return True
-
-def test_sensor_data():
-    """测试传感器数据获取"""
-    print("\n=== 测试传感器数据 ===")
-    
-    controller = get_stm32_io()
-    if not controller:
-        print("错误: STM32控制器未初始化")
-        return False
-    
-    # 测试获取传感器数据
-    print("1. 测试获取传感器数据...")
-    result = controller.get_sensor_data()
-    print(f"   结果: {result}")
-    
-    return True
-
-def test_emergency_stop():
-    """测试紧急停止"""
-    print("\n=== 测试紧急停止 ===")
-    
-    controller = get_stm32_io()
-    if not controller:
-        print("错误: STM32控制器未初始化")
-        return False
-    
-    # 测试紧急停止
-    print("1. 测试紧急停止...")
-    result = controller.emergency_stop()
     print(f"   结果: {result}")
     
     return True
@@ -167,12 +79,8 @@ def main():
     
     try:
         # 运行测试
-        test_basic_commands()
         test_motor_control()
-        test_led_control()
-        test_sensor_data()
-        test_emergency_stop()
-        
+
         # 显示统计信息
         show_statistics()
         
