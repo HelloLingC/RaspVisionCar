@@ -132,7 +132,7 @@ def mid(frame: Mat, edges: Mat) -> tuple[Mat, int]:
     cv2.line(frame, (right_x, scan_y-5), (right_x, scan_y+5), (0, 255, 0), 3)
     # 中点
     cv2.circle(frame, (mid_x, scan_y), 5, (0, 0, 255), -1)
-    # 中心线
+    # 中心线h
     cv2.line(frame, (center_x, 0), (center_x, height), (255, 0, 0), 1)
 
     return frame, error

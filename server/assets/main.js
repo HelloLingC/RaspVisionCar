@@ -120,6 +120,30 @@ function stopCar() {
         });
 }
 
+function beep() {
+    if (!isConnected) {
+        alert('设备未连接，无法蜂鸣');
+        return;
+    }
+
+    console.log('蜂鸣');
+
+    fetch('/control?command=beep')
+        .then(response => {
+            if (response.ok) {
+                console.log('蜂鸣成功');
+                alert('蜂鸣成功');
+            } else {
+                console.error('蜂鸣失败');
+                alert('蜂鸣失败');
+            }
+        })
+        .catch(error => {
+            console.error('蜂鸣时出错:', error);
+            alert('蜂鸣时出错');
+        });
+}
+
 // 速度控制
 function updateSpeed(speed) {
     currentSpeed = parseInt(speed);

@@ -68,6 +68,8 @@ def control():
         serial_io.send_command('start:,')
     elif command == 'stop':
         serial_io.send_command('stop:,')
+    elif command == 'beep':
+        serial_io.send_command('beep:,')
 
     response = Response('OK')
     response.headers['Access-Control-Allow-Origin'] = '*'
