@@ -11,6 +11,7 @@ SCREEN_HEIGHT = 480
 ROI_TOP_VERT = 70
 
 FRAME_OUTPUT_METHOD = 1 # 0: Don't Output 1: Output for ControlPanel, 2: Output with cs2.imshow() 
+SHOW_TRACKBAR = False
 
 UPTIME_START_WHEN = 0
 
@@ -24,16 +25,18 @@ def get_yellow_mask(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
     # 黄色的HSV范围
-    h_lower = cv2.getTrackbarPos("H Lower", "Video Trackbar")
-    h_upper = cv2.getTrackbarPos("H Upper", "Video Trackbar")
-    s_lower = cv2.getTrackbarPos("S Lower", "Video Trackbar")
-    s_upper = cv2.getTrackbarPos("S Upper", "Video Trackbar")
-    v_lower = cv2.getTrackbarPos("V Lower", "Video Trackbar")
-    v_upper = cv2.getTrackbarPos("V Upper", "Video Trackbar")
-    lower_yellow = np.array([h_lower, s_lower, v_lower])
-    upper_yellow = np.array([h_upper, s_upper, v_upper])
-    # lower_yellow = np.array([10, 40, 120])
-    # upper_yellow = np.array([40, 255, 255])
+    if(SHOW_TRACKBAR):
+        h_lower = cv2.getTrackbarPos("H Lower", "Video Trackbar")
+        h_upper = cv2.getTrackbarPos("H Upper", "Video Trackbar")
+        s_lower = cv2.getTrackbarPos("S Lower", "Video Trackbar")
+        s_upper = cv2.getTrackbarPos("S Upper", "Video Trackbar")
+        v_lower = cv2.getTrackbarPos("V Lower", "Video Trackbar")
+        v_upper = cv2.getTrackbarPos("V Upper", "Video Trackbar")
+        lower_yellow = np.array([h_lower, s_lower, v_lower])
+        upper_yellow = np.array([h_upper, s_upper, v_upper])
+    else:
+        lower_yellow = np.array([10, 40, 120])
+        upper_yellow = np.array([40, 255, 255])
 
     mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
@@ -191,20 +194,21 @@ def main():
         server_thread.start()
         print("Console Server will be running asynchronously")
 
-    # cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture("test/1.mp4")
+    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture("test/1.mp4")
     cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
     cap.set(cv2.CAP_PROP_CONTRAST, 0.6)
     cap.set(cv2.CAP_PROP_SATURATION, 3)
     cap.set(cv2.CAP_PROP_FPS, 30)
 
-    cv2.namedWindow("Video Trackbar", cv2.WINDOW_NORMAL)
-    cv2.createTrackbar("H Lower", "Video Trackbar", 10, 179, nothing)
-    cv2.createTrackbar("H Upper", "Video Trackbar", 40, 179, nothing)
-    cv2.createTrackbar("S Lower", "Video Trackbar", 40, 255, nothing)
-    cv2.createTrackbar("S Upper", "Video Trackbar", 255, 255, nothing)
-    cv2.createTrackbar("V Lower", "Video Trackbar", 120, 255, nothing)
-    cv2.createTrackbar("V Upper", "Video Trackbar", 255, 255, nothing)
+    if SHOW_TRACKBAR:
+        cv2.namedWindow("Video Trackbar", cv2.WINDOW_NORMAL)
+        cv2.createTrackbar("H Lower", "Video Trackbar", 10, 179, nothing)
+        cv2.createTrackbar("H Upper", "Video Trackbar", 40, 179, nothing)
+        cv2.createTrackbar("S Lower", "Video Trackbar", 40, 255, nothing)
+        cv2.createTrackbar("S Upper", "Video Trackbar", 255, 255, nothing)
+        cv2.createTrackbar("V Lower", "Video Trackbar", 120, 255, nothing)
+        cv2.createTrackbar("V Upper", "Video Trackbar", 255, 255, nothing)
 
     while True:
         ret, frame = cap.read()
