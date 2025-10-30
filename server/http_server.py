@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # 导入电机控制器
 try:
-    from gpio.motor import Motor_Controller
+    from serial_pi.motor import Motor_Controller
     motor_controller = Motor_Controller()
     print("电机控制器初始化成功")
 except ImportError as e:

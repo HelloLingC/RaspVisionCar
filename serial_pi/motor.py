@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from gpio.serial_io import get_stm32_io
+from serial_pi.serial_io import get_stm32_io
 
 
 class Motor_Controller:

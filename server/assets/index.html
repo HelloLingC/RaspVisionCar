@@ -47,12 +47,14 @@
             background: #f8f9fa;
             padding: 15px;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
+            gap: 0.5rem;
             align-items: center;
             border-bottom: 2px solid #e9ecef;
         }
 
         .status-item {
+            flex: 1;
             text-align: center;
             padding: 10px 20px;
             border-radius: 10px;
@@ -211,6 +213,11 @@
 
         .btn-emergency {
             background: #ffc107;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #000;
             color: white;
         }
 
@@ -416,8 +423,8 @@
 
         <div class="status-bar">
             <div class="status-item">
-                <div class="status-label">连接状态</div>
-                <div class="status-value" id="connection-status">已连接</div>
+                <div class="status-label">Status</div>
+                <div class="status-value" id="connection-status">Connected</div>
             </div>
             <div class="status-item">
                 <div class="status-label">Angle</div>
@@ -437,7 +444,7 @@
             <div class="video-section">
                 <h2>Video Streaming</h2>
                 <div class="video-feed">
-                    <img src="stream.mjpg" alt="小车实时视频"
+                    <img src="stream.mjpg" alt="Video Streaming"
                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgdmlld0JveD0iMCAwIDY0MCA0ODAiIGZpbGw9IiMzMzMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRleHQgeD0iMzIwIiB5PSIyNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiPua1i+ivleWbvueJh+WumOe9rjwvdGV4dD48L3N2Zz4='">
                 </div>
             </div>
@@ -454,25 +461,25 @@
                     </div>
 
                     <div class="speed-control">
-                        <h3>速度控制: <span id="speed-value">50%</span></h3>
+                        <h3>Speed Control: <span id="speed-value">50%</span></h3>
                         <input type="range" class="speed-slider" id="speed-slider" min="0" max="100" value="50"
                             oninput="updateSpeed(this.value)">
                     </div>
 
                     <div class="action-buttons">
-                        <button class="action-btn btn-start" onclick="startCar()">启动</button>
-                        <button class="action-btn btn-stop" onclick="stopCar()">停止</button>
-                        <button class="action-btn btn-emergency" onclick="emergencyStop()">紧急停止</button>
+                        <button class="action-btn btn-start" onclick="startCar()">Start</button>
+                        <button class="action-btn btn-stop" onclick="stopCar()">Stop</button>
+                        <button class="action-btn btn-emergency">Battery Saver</button>
                     </div>
                 </div>
             </div>
 
             <!-- PID参数调整区域 -->
             <div class="pid-control">
-                <h3>PID参数调整</h3>
+                <h3>PID Parameters Adjustment</h3>
 
                 <div class="pid-section">
-                    <h4>方向控制PID</h4>
+                    <h4>Left Motor PID</h4>
                     <div class="pid-params">
                         <div class="pid-param">
                             <label>Kp (比例):</label>
@@ -496,7 +503,7 @@
                 </div>
 
                 <div class="pid-section">
-                    <h4>速度控制PID</h4>
+                    <h4>Right Motor PID</h4>
                     <div class="pid-params">
                         <div class="pid-param">
                             <label>Kp (比例):</label>
@@ -520,8 +527,8 @@
                 </div>
 
                 <div class="pid-actions">
-                    <button class="action-btn" style="background: #17a2b8;" onclick="applyPidParams()">应用PID参数</button>
-                    <button class="action-btn" style="background: #6c757d;" onclick="resetPidParams()">重置默认值</button>
+                    <button class="action-btn btn-primary" onclick="applyPidParams()">应用PID参数</button>
+                    <button class="action-btn" onclick="resetPidParams()">重置默认值</button>
                 </div>
             </div>
         </div>

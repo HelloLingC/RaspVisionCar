@@ -12,8 +12,8 @@ import time
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
-from gpio.serial_io import init_stm32_io, get_stm32_io, cleanup_stm32_io
-from gpio.motor import Motor_Controller
+from serial_pi.serial_io import init_stm32_io, get_stm32_io, cleanup_stm32_io
+from serial_pi.motor import Motor_Controller
 
 
 def test_motor_control():
