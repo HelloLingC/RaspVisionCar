@@ -369,21 +369,21 @@ class STM32SerialIO:
                 self.data_queue.get_nowait()
             except queue.Empty:
                 break
-    
+
     def _send_test_command(self) -> bool:
         """
         发送测试命令验证连接
-        
+
         Returns:
             测试是否成功
         """
         try:
-            test_cmd = "PING"
+            test_cmd = "ping"
             response = self._send_raw_command(test_cmd, expect_response=True)
             return response is not None
         except:
             return False
-    
+
     def _send_raw_command(self, command: str, expect_response: bool = False) -> Optional[str]:
         """
         发送原始命令到STM32

@@ -10,9 +10,6 @@ SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 ROI_TOP_VERT = 70
 
-FRAME_OUTPUT_METHOD = 1 # 0: Don't Output 1: Output for ControlPanel, 2: Output with cs2.imshow() 
-SHOW_TRACKBAR = False
-
 UPTIME_START_WHEN = 0
 
 def nothing(x):
@@ -25,7 +22,7 @@ def get_yellow_mask(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
     # 黄色的HSV范围
-    if(SHOW_TRACKBAR):
+    if(config.SHOW_TRACKBAR):
         h_lower = cv2.getTrackbarPos("H Lower", "Video Trackbar")
         h_upper = cv2.getTrackbarPos("H Upper", "Video Trackbar")
         s_lower = cv2.getTrackbarPos("S Lower", "Video Trackbar")
@@ -174,17 +171,17 @@ def handle_one_frame(frame: Mat):
     cv2.putText(frame, f"Turn: {error}", (config.DEBUG_LEFT_MARGIN, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(155,55,0), 2)
 
     
-    if(FRAME_OUTPUT_METHOD == 1):
+    if(config.FRAME_OUTPUT_METHOD == 1):
         success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
         if success:
             server.output.write(jpeg_data.tobytes())
-    elif(FRAME_OUTPUT_METHOD == 2):
+    elif(config.FRAME_OUTPUT_METHOD == 2):
         cv2.imshow("Original", frame)
         cv2.imshow("Track Line", yellow_mask)
 
 def main():
     # 异步启动服务器
-    if(FRAME_OUTPUT_METHOD == 1):
+    if(config.FRAME_OUTPUT_METHOD == 1):
         if not serial_io.init_stm32_io():
             print("STM32 Serial IO initialization failed")
             exit(1)
@@ -201,7 +198,7 @@ def main():
     cap.set(cv2.CAP_PROP_SATURATION, 3)
     cap.set(cv2.CAP_PROP_FPS, 30)
 
-    if SHOW_TRACKBAR:
+    if config.SHOW_TRACKBAR:
         cv2.namedWindow("Video Trackbar", cv2.WINDOW_NORMAL)
         cv2.createTrackbar("H Lower", "Video Trackbar", 10, 179, nothing)
         cv2.createTrackbar("H Upper", "Video Trackbar", 40, 179, nothing)
