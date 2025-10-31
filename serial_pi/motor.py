@@ -7,17 +7,17 @@ class Motor_Controller:
     def send_turn_angle(self, angle: int) -> Dict[str, Any]:
         try:
             # 限速：两次发送之间至少间隔 50ms
-            min_interval_seconds = 0.05
-            last_ts = getattr(self, "_last_turn_send_ts", 0.0)
-            now = time.monotonic()
-            delta = now - last_ts
-            if delta < min_interval_seconds:
-                time.sleep(min_interval_seconds - delta)
+            # min_interval_seconds = 0.05
+            # last_ts = getattr(self, "_last_turn_send_ts", 0.0)
+            # now = time.monotonic()
+            # delta = now - last_ts
+            # if delta < min_interval_seconds:
+            #     time.sleep(min_interval_seconds - delta)
 
-            # 记录发送时间戳
-            self._last_turn_send_ts = time.monotonic()
+            # # 记录发送时间戳
+            # self._last_turn_send_ts = time.monotonic()
 
-            return get_stm32_io().send_command(f'ta:{angle}\n')
+            return get_stm32_io().send_command(f'{angle}\n')
         except Exception as e:
             # print(f"发送转向角度失败: {e}")
             return None
