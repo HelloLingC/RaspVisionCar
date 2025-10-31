@@ -89,10 +89,13 @@ class STM32SerialIO:
                     logger.info(f"找到可能的STM32设备: {port.device}")
                     return port.device
             
+            if "/dev/ttyAMA0" in [port.device for port in ports]:
+                logger.info(f"使用 /dev/ttyAMA0 端口")
+                return "/dev/ttyAMA0"
             # 如果没有找到特定设备，返回第一个可用端口
-            if ports:
-                logger.info(f"使用第一个可用端口: {ports[0].device}")
-                return ports[0].device
+            # if ports:
+            #     logger.info(f"使用第一个可用端口: {ports[0].device}")
+            #     return ports[0].device
                 
         except Exception as e:
             logger.error(f"查找串口设备失败: {e}")

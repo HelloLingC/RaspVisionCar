@@ -61,78 +61,78 @@ def get_roi(image: Mat):
     return roi, pts
 
 
-# def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
-#     halfWidth= follow.shape[1] // 2
-#     half = halfWidth  # 从下往上扫描赛道,最下端取图片中线为分割线
-#     for y in range(follow.shape[0] - 1, -1, -1):
-#         if SCREEN_HEIGHT - y > ROI_TOP_VERT + 20:
-#             break
-#         # 加入分割线左右各半张图片的宽度作为约束,减小邻近赛道的干扰
-#         if (mask[y][max(0,half-halfWidth):half] == np.zeros_like(mask[y][max(0,half-halfWidth):half])).all():  # 分割线左端无赛道
-#             left = max(0,half-halfWidth)  # 取图片左边界
-#         else:
-#             left = np.average(np.where(mask[y][0:half] == 255))  # 计算分割线左端平均位置
-#         if (mask[y][half:min(follow.shape[1],half+halfWidth)] == np.zeros_like(mask[y][half:min(follow.shape[1],half+halfWidth)])).all():  # 分割线右端无赛道
-#             right = min(follow.shape[1],half+halfWidth)  # 取图片右边界
-#         else:
-#             right = np.average(np.where(mask[y][half:follow.shape[1]] == 255)) + half  # 计算分割线右端平均位置
+def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
+    halfWidth= follow.shape[1] // 2
+    half = halfWidth  # 从下往上扫描赛道,最下端取图片中线为分割线
+    for y in range(follow.shape[0] - 1, -1, -1):
+        if SCREEN_HEIGHT - y > ROI_TOP_VERT + 20:
+            break
+        # 加入分割线左右各半张图片的宽度作为约束,减小邻近赛道的干扰
+        if (mask[y][max(0,half-halfWidth):half] == np.zeros_like(mask[y][max(0,half-halfWidth):half])).all():  # 分割线左端无赛道
+            left = max(0,half-halfWidth)  # 取图片左边界
+        else:
+            left = np.average(np.where(mask[y][0:half] == 255))  # 计算分割线左端平均位置
+        if (mask[y][half:min(follow.shape[1],half+halfWidth)] == np.zeros_like(mask[y][half:min(follow.shape[1],half+halfWidth)])).all():  # 分割线右端无赛道
+            right = min(follow.shape[1],half+halfWidth)  # 取图片右边界
+        else:
+            right = np.average(np.where(mask[y][half:follow.shape[1]] == 255)) + half  # 计算分割线右端平均位置
  
-#         mid = (left + right) // 2  # 计算拟合中点
-#         half = int(mid)  # 递归,从下往上确定分割线
-#         follow[y, int(mid)] = 255  # 画出拟合中线
+        mid = (left + right) // 2  # 计算拟合中点
+        half = int(mid)  # 递归,从下往上确定分割线
+        follow[y, int(mid)] = 255  # 画出拟合中线
 
-#         print(f"y: {y}, mid: {mid}")
+        print(f"y: {y}, mid: {mid}")
  
-#         if y == 360:  # 设置指定提取中点的纵轴位置
-#             mid_output = int(mid)
+        if y == 360:  # 设置指定提取中点的纵轴位置
+            mid_output = int(mid)
  
-#     cv2.circle(follow, (mid_output, 360), 5, 255, -1)  # opencv为(x,y),画出指定提取中点
+    cv2.circle(follow, (mid_output, 360), 5, 255, -1)  # opencv为(x,y),画出指定提取中点
  
-#     error = follow.shape[1] // 2 - mid_output  # 计算图片中点与指定提取中点的误差
+    error = follow.shape[1] // 2 - mid_output  # 计算图片中点与指定提取中点的误差
  
-#     return follow, error  # error为正数右转,为负数左转
+    return follow, error  # error为正数右转,为负数左转
 
-def mid(frame: Mat, edges: Mat) -> tuple[Mat, int]:
-    height, width = edges.shape[:2]
+# def mid(frame: Mat, edges: Mat) -> tuple[Mat, int]:
+#     height, width = edges.shape[:2]
 
-    # 选取底部某一水平线
-    scan_y = int(height * 0.75)
+#     # 选取底部某一水平线
+#     scan_y = int(height * 0.75)
 
-    # 提取该行的边缘像素（非零即检测到线）
-    scan_line = edges[scan_y, :]
+#     # 提取该行的边缘像素（非零即检测到线）
+#     scan_line = edges[scan_y, :]
 
-    # 找出所有非零点的 x 坐标
-    white_x = np.where(scan_line > 0)[0]
+#     # 找出所有非零点的 x 坐标
+#     white_x = np.where(scan_line > 0)[0]
 
-    if len(white_x) < 2:
-        # 检测不到左右两条线，返回原图和 0 偏差
-        return frame, 0
+#     if len(white_x) < 2:
+#         # 检测不到左右两条线，返回原图和 0 偏差
+#         return frame, 0
 
-    # 左右两条线的最左最右点
-    left_x = white_x[0]
-    right_x = white_x[-1]
+#     # 左右两条线的最左最右点
+#     left_x = white_x[0]
+#     right_x = white_x[-1]
 
-    # 计算赛道中点
-    mid_x = (left_x + right_x) // 2
+#     # 计算赛道中点
+#     mid_x = (left_x + right_x) // 2
 
-    # 图像中心
-    center_x = width // 2
+#     # 图像中心
+#     center_x = width // 2
 
-    # 计算偏差（右偏为正，左偏为负）
-    error = mid_x - center_x
+#     # 计算偏差（右偏为正，左偏为负）
+#     error = mid_x - center_x
 
-    # --- 可视化部分 ---
-    # 画出扫描线
-    cv2.line(frame, (0, scan_y), (width, scan_y), (255, 255, 0), 1)
-    # 左右线
-    cv2.line(frame, (left_x, scan_y-5), (left_x, scan_y+5), (0, 255, 0), 3)
-    cv2.line(frame, (right_x, scan_y-5), (right_x, scan_y+5), (0, 255, 0), 3)
-    # 中点
-    cv2.circle(frame, (mid_x, scan_y), 5, (0, 0, 255), -1)
-    # 中心线h
-    cv2.line(frame, (center_x, 0), (center_x, height), (255, 0, 0), 1)
+#     # --- 可视化部分 ---
+#     # 画出扫描线
+#     cv2.line(frame, (0, scan_y), (width, scan_y), (255, 255, 0), 1)
+#     # 左右线
+#     cv2.line(frame, (left_x, scan_y-5), (left_x, scan_y+5), (0, 255, 0), 3)
+#     cv2.line(frame, (right_x, scan_y-5), (right_x, scan_y+5), (0, 255, 0), 3)
+#     # 中点
+#     cv2.circle(frame, (mid_x, scan_y), 5, (0, 0, 255), -1)
+#     # 中心线h
+#     cv2.line(frame, (center_x, 0), (center_x, height), (255, 0, 0), 1)
 
-    return frame, error
+#     return frame, error
 
 
 
