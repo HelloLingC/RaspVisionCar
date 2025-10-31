@@ -135,7 +135,7 @@ class STM32SerialIO:
                 logger.info(f"成功连接到STM32设备: {self.port}")
                 
                 # 启动数据接收线程
-                # self.start_receiving()
+                self.start_receiving()
                 
                 # 发送测试命令
                 if self._send_test_command():
@@ -238,11 +238,11 @@ class STM32SerialIO:
                 raw_data=data,
                 data_type="unknown"
             )
-            
+
             # 尝试解析数据
             data_str = data.decode('utf-8')
-            print(f"收到数据: {data_str}")
-            
+            # print(f"收到数据: {data_str}")
+
             # 添加到队列
             try:
                 self.data_queue.put_nowait(serial_data)
