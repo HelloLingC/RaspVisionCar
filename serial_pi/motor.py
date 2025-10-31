@@ -1,10 +1,14 @@
 from typing import Dict, Any
 from serial_pi.serial_io import get_stm32_io
 
-
 class Motor_Controller:
-    def __init__(self):
-        self.stm32_io = get_stm32_io()
+
+    def send_turn_angle(self, angle: int) -> Dict[str, Any]:
+        try:
+            return get_stm32_io().send_command(f'ta:{angle}\n')
+        except Exception as e:
+            # print(f"发送转向角度失败: {e}")
+            return None
 
     def set_motor_speed(self, left_speed: int, right_speed: int) -> Dict[str, Any]:
         """
@@ -21,4 +25,9 @@ class Motor_Controller:
     
     def set_pid_params(self, direction: str, kp: float, ki: float, kd: float):
         self.stm32_io.send_command(f'PID:{direction}:{kp}:{ki}:{kd}')
-        
+
+
+motor_controller = Motor_Controller()
+
+def get_motor_controller() -> Motor_Controller:
+    return motor_controller

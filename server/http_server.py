@@ -2,7 +2,6 @@
 # should be running on Raspberry Pi
 
 from flask import Flask, Response, request, send_file
-import time
 import threading
 import io
 import sys

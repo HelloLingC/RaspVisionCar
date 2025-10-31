@@ -5,10 +5,11 @@ import config
 import server.http_server as server
 import threading
 import serial_pi.serial_io as serial_io
+import serial_pi.motor as motor
 
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
-ROI_TOP_VERT = 360
+ROI_TOP_VERT = 450
 
 UPTIME_START_WHEN = 0
 
@@ -49,7 +50,7 @@ def get_roi(image: Mat):
     mask = np.zeros(image.shape[:2], dtype=np.uint8)
 
     # Define trapezoid points  左下 右下 右上 左上
-    pts = np.array([[0, height], [width-10, height], [width-80, ROI_TOP_VERT], [170, ROI_TOP_VERT]], np.int32)
+    pts = np.array([[0, height], [width-10, height], [width-80, 30], [120, 30]], np.int32)
     pts = pts.reshape((-1, 1, 2))
 
     # Fill the trapezoid area on mask
@@ -65,7 +66,7 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
     halfWidth= follow.shape[1] // 2
     half = halfWidth  # 从下往上扫描赛道,最下端取图片中线为分割线
     for y in range(follow.shape[0] - 1, -1, -1):
-        if SCREEN_HEIGHT - y > ROI_TOP_VERT + 20:
+        if SCREEN_HEIGHT - y > ROI_TOP_VERT:
             break
         # 加入分割线左右各半张图片的宽度作为约束,减小邻近赛道的干扰
         if (mask[y][max(0,half-halfWidth):half] == np.zeros_like(mask[y][max(0,half-halfWidth):half])).all():  # 分割线左端无赛道
@@ -170,7 +171,8 @@ def handle_one_frame(frame: Mat):
     follow, error = mid(frame, edges)
     cv2.putText(frame, f"Turn: {error}", (config.DEBUG_LEFT_MARGIN, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(155,55,0), 2)
 
-    
+    motor.get_motor_controller().send_turn_angle(error)
+
     if(config.FRAME_OUTPUT_METHOD == 1):
         success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
         if success:
@@ -213,10 +215,7 @@ def main():
             break
         frame = cv2.resize(frame, (640, 480))
 
-        # handle_one_frame(frame)
-        success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
-        if success:
-            server.output.write(jpeg_data.tobytes())
+        handle_one_frame(frame)
 
         # 按'q'退出
         if cv2.waitKey(1) & 0xFF == ord('q'):
