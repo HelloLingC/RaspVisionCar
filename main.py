@@ -193,8 +193,8 @@ def main():
 
     cap = cv2.VideoCapture(0)
     # cap = cv2.VideoCapture("test/1.mp4")
-    cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
-    cap.set(cv2.CAP_PROP_CONTRAST, 0.6)
+    # cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
+    # cap.set(cv2.CAP_PROP_CONTRAST, 0.6)
     cap.set(cv2.CAP_PROP_SATURATION, 3)
     cap.set(cv2.CAP_PROP_FPS, 30)
 
