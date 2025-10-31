@@ -133,16 +133,10 @@ class STM32SerialIO:
                 self.connected = True
                 self.stats['connection_time'] = time.time()
                 logger.info(f"成功连接到STM32设备: {self.port}")
-                
+
                 # 启动数据接收线程
                 self.start_receiving()
-                
-                # 发送测试命令
-                if self._send_test_command():
-                    return True
-                else:
-                    logger.warning("连接成功但测试命令失败")
-                    return True  # 仍然返回True，可能STM32没有实现测试命令
+
             else:
                 logger.error("串口连接失败")
                 return False
