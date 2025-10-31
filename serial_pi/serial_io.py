@@ -136,7 +136,7 @@ class STM32SerialIO:
 
                 # 启动数据接收线程
                 self.start_receiving()
-
+                return True
             else:
                 logger.error("串口连接失败")
                 return False
