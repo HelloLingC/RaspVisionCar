@@ -385,7 +385,7 @@ class STM32SerialIO:
         with self.lock:
             try:
                 # 发送命令
-                command_bytes = command.encode('utf-8')
+                command_bytes = command.encode('ascii')
                 self.serial_conn.write(command_bytes)
                 self.serial_conn.flush()
 
