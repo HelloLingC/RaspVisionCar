@@ -373,20 +373,6 @@ class STM32SerialIO:
             except queue.Empty:
                 break
 
-    def _send_test_command(self) -> bool:
-        """
-        发送测试命令验证连接
-
-        Returns:
-            测试是否成功
-        """
-        try:
-            test_cmd = "ping"
-            response = self._send_raw_command(test_cmd, expect_response=True)
-            return response is not None
-        except:
-            return False
-
     def _send_raw_command(self, command: str, expect_response: bool = False) -> Optional[str]:
         """
         发送原始命令到STM32
@@ -409,10 +395,9 @@ class STM32SerialIO:
                 self.serial_conn.write(command_bytes)
                 self.serial_conn.flush()
 
-                self.stats['commands_sent'] += 1
-                self.stats['bytes_sent'] += len(command_bytes)
-                self.stats['last_command_time'] = time.time()
-                logger.debug(f"发送命令: {command.strip()}")
+                # self.stats['commands_sent'] += 1
+                # self.stats['bytes_sent'] += len(command_bytes)
+                # self.stats['last_command_time'] = time.time()
 
                 if expect_response:
                     # 等待响应
@@ -433,17 +418,8 @@ class STM32SerialIO:
     def send_command(self, command: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         """
-        return self._send_raw_command(command, expect_response=True)
+        return self._send_raw_command(command, expect_response=False)
 
-    def get_status(self) -> Dict[str, Any]:
-        """
-        获取STM32状态
-        
-        Returns:
-            状态信息
-        """
-        return self.send_command('get_status')
-    
     def get_stats(self) -> Dict[str, Any]:
         """
         获取连接统计信息

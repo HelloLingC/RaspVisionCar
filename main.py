@@ -171,7 +171,7 @@ def handle_one_frame(frame: Mat):
     follow, error = mid(frame, edges)
     cv2.putText(frame, f"Turn: {error}", (config.DEBUG_LEFT_MARGIN, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(155,55,0), 2)
 
-    # motor.get_motor_controller().send_turn_angle(error)
+    motor.get_motor_controller().send_turn_angle(error)
 
     if(config.FRAME_OUTPUT_METHOD == 1):
         success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
