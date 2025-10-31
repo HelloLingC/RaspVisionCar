@@ -65,11 +65,11 @@ def control():
 
     print(f"HTTP Command: {command}")
     if command == 'start':
-        serial_io.get_stm32_io().send_command('start')
+        serial_io.get_stm32_io().send_command('start\n')
     elif command == 'stop':
-        serial_io.get_stm32_io().send_command('stop')
+        serial_io.get_stm32_io().send_command('stop\n')
     elif command == 'beep':
-        serial_io.get_stm32_io().send_command('beep')
+        serial_io.get_stm32_io().send_command('beep\n')
 
     response = Response('OK')
     response.headers['Access-Control-Allow-Origin'] = '*'

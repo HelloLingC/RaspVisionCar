@@ -81,7 +81,7 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
         half = int(mid)  # 递归,从下往上确定分割线
         follow[y, int(mid)] = 255  # 画出拟合中线
 
-        print(f"y: {y}, mid: {mid}")
+        # print(f"y: {y}, mid: {mid}")
  
         if y == 360:  # 设置指定提取中点的纵轴位置
             mid_output = int(mid)
@@ -195,8 +195,8 @@ def main():
     # cap = cv2.VideoCapture("test/1.mp4")
     # cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
     # cap.set(cv2.CAP_PROP_CONTRAST, 0.6)
-    cap.set(cv2.CAP_PROP_SATURATION, 3)
-    cap.set(cv2.CAP_PROP_FPS, 30)
+    # cap.set(cv2.CAP_PROP_SATURATION, 3)
+    # cap.set(cv2.CAP_PROP_FPS, 30)
 
     if config.SHOW_TRACKBAR:
         cv2.namedWindow("Video Trackbar", cv2.WINDOW_NORMAL)
