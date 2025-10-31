@@ -3,15 +3,14 @@
 
 // 全局变量
 let currentSpeed = 50;
-let isConnected = false;
 let uptimeInterval;
 
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
     console.log('RaspVisionCar Console 初始化');
     
-    // 初始化连接状态
-    updateConnectionStatus(true);
+    // 初始化小车运行状态
+    updateCarStatus(false);
     
     // 启动运行时间计时器
     startUptimeCounter();
@@ -21,16 +20,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 连接状态管理
-function updateConnectionStatus(connected) {
+function updateCarStatus(status) {
     const statusElement = document.getElementById('connection-status');
-    if (connected) {
-        statusElement.textContent = '已连接';
+    if (status) {
+        statusElement.textContent = 'Running';
         statusElement.style.color = '#4CAF50';
-        isConnected = true;
     } else {
-        statusElement.textContent = '未连接';
+        statusElement.textContent = 'Stopped';
         statusElement.style.color = '#dc3545';
-        isConnected = false;
     }
 }
 
@@ -51,13 +48,8 @@ function startUptimeCounter() {
 
 // 小车控制函数
 function move(direction) {
-    if (!isConnected) {
-        alert('设备未连接，无法控制');
-        return;
-    }
-    
     console.log(`移动命令: ${direction}, 速度: ${currentSpeed}`);
-    
+
     // 发送控制命令到后端
     fetch(`/control?command=${direction}&speed=${currentSpeed}`)
         .then(response => {
@@ -73,18 +65,13 @@ function move(direction) {
 }
 
 function startCar() {
-    if (!isConnected) {
-        alert('设备未连接，无法启动');
-        return;
-    }
-
     console.log('启动小车');
 
     fetch('/control?command=start')
         .then(response => {
             if (response.ok) {
                 console.log('小车启动成功');
-                alert('小车已启动');
+                updateCarStatus(true);
             } else {
                 console.error('小车启动失败');
                 alert('小车启动失败');
@@ -97,18 +84,13 @@ function startCar() {
 }
 
 function stopCar() {
-    if (!isConnected) {
-        alert('设备未连接，无法停止');
-        return;
-    }
-    
     console.log('停止小车');
     
     fetch('/control?command=stop')
         .then(response => {
             if (response.ok) {
                 console.log('小车停止成功');
-                alert('小车已停止');
+                updateCarStatus(false);
             } else {
                 console.error('小车停止失败');
                 alert('小车停止失败');
@@ -121,18 +103,12 @@ function stopCar() {
 }
 
 function beep() {
-    if (!isConnected) {
-        alert('设备未连接，无法蜂鸣');
-        return;
-    }
-
     console.log('蜂鸣');
 
     fetch('/control?command=beep')
         .then(response => {
             if (response.ok) {
                 console.log('蜂鸣成功');
-                alert('蜂鸣成功');
             } else {
                 console.error('蜂鸣失败');
                 alert('蜂鸣失败');
@@ -161,11 +137,6 @@ function updatePidParam(type, param, value) {
 }
 
 function applyPidParams() {
-    if (!isConnected) {
-        alert('设备未连接，无法设置PID参数');
-        return;
-    }
-    
     // 获取方向控制PID参数
     const directionKp = document.getElementById('direction-kp').value;
     const directionKi = document.getElementById('direction-ki').value;

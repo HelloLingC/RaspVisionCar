@@ -213,7 +213,10 @@ def main():
             break
         frame = cv2.resize(frame, (640, 480))
 
-        handle_one_frame(frame)
+        # handle_one_frame(frame)
+        success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        if success:
+            server.output.write(jpeg_data.tobytes())
 
         # 按'q'退出
         if cv2.waitKey(1) & 0xFF == ord('q'):
