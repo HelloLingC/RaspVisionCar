@@ -135,7 +135,7 @@ class STM32SerialIO:
                 logger.info(f"成功连接到STM32设备: {self.port}")
                 
                 # 启动数据接收线程
-                self.start_receiving()
+                # self.start_receiving()
                 
                 # 发送测试命令
                 if self._send_test_command():
