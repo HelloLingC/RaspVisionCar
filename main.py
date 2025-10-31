@@ -8,7 +8,7 @@ import serial_pi.serial_io as serial_io
 
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
-ROI_TOP_VERT = 70
+ROI_TOP_VERT = 360
 
 UPTIME_START_WHEN = 0
 
