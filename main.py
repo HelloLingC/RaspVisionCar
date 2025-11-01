@@ -174,7 +174,7 @@ def handle_one_frame(frame: Mat):
     motor.get_motor_controller().send_turn_angle(error)
 
     if(config.FRAME_OUTPUT_METHOD == 1):
-        success, jpeg_data = cv2.imencode('.jpeg', yellow_mask, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
         if success:
             server.output.write(jpeg_data.tobytes())
     elif(config.FRAME_OUTPUT_METHOD == 2):
