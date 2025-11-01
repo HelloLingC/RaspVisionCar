@@ -9,7 +9,7 @@ import serial_pi.motor as motor
 
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
-ROI_TOP_VERT = 450
+ROI_TOP_VERT = 380
 
 UPTIME_START_WHEN = 0
 
@@ -84,10 +84,10 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
 
         # print(f"y: {y}, mid: {mid}")
  
-        if y == 360:  # 设置指定提取中点的纵轴位置
+        if y == 290:  # 设置指定提取中点的纵轴位置
             mid_output = int(mid)
  
-    cv2.circle(follow, (mid_output, 360), 5, 255, -1)  # opencv为(x,y),画出指定提取中点
+    cv2.circle(follow, (mid_output, 290), 5, 255, -1)  # opencv为(x,y),画出指定提取中点
  
     error = follow.shape[1] // 2 - mid_output  # 计算图片中点与指定提取中点的误差
  
@@ -174,7 +174,7 @@ def handle_one_frame(frame: Mat):
     motor.get_motor_controller().send_turn_angle(error)
 
     if(config.FRAME_OUTPUT_METHOD == 1):
-        success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
+        success, jpeg_data = cv2.imencode('.jpeg', yellow_mask, [cv2.IMWRITE_JPEG_QUALITY, 90])
         if success:
             server.output.write(jpeg_data.tobytes())
     elif(config.FRAME_OUTPUT_METHOD == 2):
