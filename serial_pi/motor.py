@@ -17,7 +17,7 @@ class Motor_Controller:
             # # 记录发送时间戳
             # self._last_turn_send_ts = time.monotonic()
 
-            return get_stm32_io().send_command(f'{angle}\n')
+            return get_stm32_io().send_command(f'ta:{angle}\n')
         except Exception as e:
             # print(f"发送转向角度失败: {e}")
             return None
