@@ -52,11 +52,6 @@ class STM32SerialIO:
         self.data_buffer = b''
         self.data_callbacks: List[Callable[[SerialData], None]] = []
         
-        # 协议配置
-        self.response_prefix = "ACK:"
-        self.error_prefix = "ERR:"
-        self.data_prefix = "DTP"
-        
         # 统计信息
         self.stats = {
             'commands_sent': 0,
@@ -386,6 +381,9 @@ class STM32SerialIO:
             try:
                 # 发送命令
                 command_bytes = command.encode('ascii')
+                if(len(command_bytes) < 24):
+                    command_bytes = command_bytes.ljust(24, b'\x00')
+                
                 self.serial_conn.write(command_bytes)
                 self.serial_conn.flush()
 
@@ -413,28 +411,7 @@ class STM32SerialIO:
         """
         """
         return self._send_raw_command(command, expect_response=False)
-
-    def get_stats(self) -> Dict[str, Any]:
-        """
-        获取连接统计信息
-        
-        Returns:
-            统计信息字典
-        """
-        stats = self.stats.copy()
-        stats['connected'] = self.connected
-        stats['port'] = self.port
-        stats['baudrate'] = self.baudrate
-        stats['queue_size'] = self.data_queue.qsize()
-        stats['receive_running'] = self.receive_running
-        
-        if self.stats['connection_time']:
-            stats['uptime'] = time.time() - self.stats['connection_time']
-        else:
-            stats['uptime'] = 0
-            
-        return stats
-
+   
 # 全局STM32控制器实例
 _stm32_io: Optional[STM32SerialIO] = None
 
@@ -506,10 +483,6 @@ if __name__ == '__main__':
                 latest_data = _stm32_io.get_latest_data()
                 if latest_data:
                     print(f"最新数据: {latest_data.data_type} - {latest_data.parsed_data}")
-            
-            # 获取统计信息
-            stats = _stm32_io.get_stats()
-            print(f"\n统计信息: {stats}")
             
         except KeyboardInterrupt:
             print("用户中断")
