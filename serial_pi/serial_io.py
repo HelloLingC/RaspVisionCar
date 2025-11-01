@@ -381,8 +381,8 @@ class STM32SerialIO:
             try:
                 # 发送命令
                 command_bytes = command.encode('ascii')
-                if(len(command_bytes) < 16):
-                    command_bytes = command_bytes.ljust(16, b'\n')
+                # if(len(command_bytes) < 16):
+                #     command_bytes = command_bytes.ljust(16, b'\n')
                 
                 self.serial_conn.write(command_bytes)
                 self.serial_conn.flush()
