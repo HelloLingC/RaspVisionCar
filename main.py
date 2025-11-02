@@ -54,7 +54,7 @@ def get_roi(image: Mat):
     mask = np.zeros(image.shape[:2], dtype=np.uint8)
 
     # Define trapezoid points  左下 右下 右上 左上
-    pts = np.array([[0, height], [width-10, height], [width-80, 30], [120, 30]], np.int32)
+    pts = np.array([[10, height], [width-10, height], [30, 120], [width-30, 120]], np.int32)
     pts = pts.reshape((-1, 1, 2))
 
     # Fill the trapezoid area on mask
@@ -107,8 +107,8 @@ def handle_one_frame(frame: Mat):
     # TODO: Add light detection
     # light_detect.handle_lights(frame)
 
-    # roi, pts = get_roi(frame)
-    roi = frame
+    roi, pts = get_roi(frame)
+    # roi = frame
     roi = cv2.GaussianBlur(roi, (5, 5), 0)
 
     yellow_mask = get_yellow_mask(roi)
@@ -133,7 +133,7 @@ def handle_one_frame(frame: Mat):
     frame[mask] = [0, 0, 255]
 
     # Draw ROI region
-    # cv2.polylines(frame, [pts], isClosed=True, color=(255, 0, 55), thickness=1)
+    cv2.polylines(frame, [pts], isClosed=True, color=(255, 0, 55), thickness=1)
 
     follow, error = mid(frame, edges)
     cv2.putText(frame, f"Turn: {error}", (config.DEBUG_LEFT_MARGIN, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(155,55,0), 2)
