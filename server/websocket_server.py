@@ -30,33 +30,6 @@ websocket_server = None
 server_loop = None
 shutdown_event = threading.Event()
 
-def calculate_motor_speeds(direction: str, speed: int) -> tuple:
-    """
-    根据方向和速度计算左右电机速度
-    
-    Args:
-        direction: 方向 ('forward', 'backward', 'left', 'right')
-        speed: 速度百分比 (0-100)
-        
-    Returns:
-        (left_speed, right_speed) 元组，速度范围 -100 到 100
-    """
-    # 将百分比转换为实际速度值
-    actual_speed = int(speed)
-    
-    if direction == 'forward':
-        return (actual_speed, actual_speed)
-    elif direction == 'backward':
-        return (-actual_speed, -actual_speed)
-    elif direction == 'left':
-        # 左转：左轮减速或反转，右轮保持
-        return (-actual_speed // 2, actual_speed)
-    elif direction == 'right':
-        # 右转：右轮减速或反转，左轮保持
-        return (actual_speed, -actual_speed // 2)
-    else:
-        return (0, 0)
-
 async def handle_client(websocket):
     """处理客户端 WebSocket 连接"""
     # 添加客户端到连接集合
@@ -79,45 +52,23 @@ async def handle_client(websocket):
                 
                 if command_type == 'move':
                     # 处理移动命令
-                    direction = data.get('direction', '')
-                    speed = data.get('speed', 50)
-                    
-                    print(f"收到移动命令: 方向={direction}, 速度={speed}%")
-                    
-                    # 计算电机速度
-                    left_speed, right_speed = calculate_motor_speeds(direction, speed)
-                    
+                    turn_angle = data.get('turn_angle', 0)
+                    left_speed = data.get('left_speed', 50)
+                    right_speed = data.get('right_speed', 50)
+
                     # 发送命令到STM32
-                    if motor_controller:
-                        try:
-                            stm32_io = serial_io.get_stm32_io()
-                            if stm32_io and stm32_io.connected:
-                                # 使用串口IO发送电机速度命令
-                                command = f'LS:{left_speed},RS:{right_speed}\n'
-                                stm32_io.send_command(command)
-                                print(f"已发送电机命令: {command.strip()}")
-                                
-                                # 发送确认消息
-                                await websocket.send(json.dumps({
-                                    'type': 'move_ack',
-                                    'direction': direction,
-                                    'speed': speed,
-                                    'left_speed': left_speed,
-                                    'right_speed': right_speed,
-                                    'status': 'success'
-                                }))
-                            else:
-                                print("STM32 串口未连接")
-                                await websocket.send(json.dumps({
-                                    'type': 'error',
-                                    'message': 'STM32 串口未连接'
-                                }))
-                        except Exception as e:
-                            print(f"发送移动命令失败: {e}")
-                            await websocket.send(json.dumps({
-                                'type': 'error',
-                                'message': f'发送命令失败: {str(e)}'
-                            }))
+                    stm32_io = serial_io.get_stm32_io()
+                    if stm32_io and stm32_io.connected:
+                        command = f'ta:{turn_angle},lv:{left_speed},rv:{right_speed}\n'
+                        stm32_io.send_command(command)
+                        print(f"已发送电机命令: {command.strip()}")
+                        
+                        # 发送确认消息
+                        await websocket.send(json.dumps({
+                            'type': 'move_ack',
+                            'turn_angle': turn_angle,
+                            'status': 'success'
+                        }))
                     else:
                         await websocket.send(json.dumps({
                             'type': 'error',

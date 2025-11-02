@@ -101,32 +101,19 @@ function startUptimeCounter() {
 }
 
 // 小车控制函数
-function move(direction) {
-    console.log(`移动命令: ${direction}, 速度: ${currentSpeed}`);
+function move(turn_angle, left_speed, right_speed) {
+    console.log(`移动命令: 转向角度: ${turn_angle}, 左速度: ${left_speed}, 右速度: ${right_speed}`);
 
     // 通过 WebSocket 发送移动命令
     if (websocket && websocket.readyState === WebSocket.OPEN) {
         const message = {
             type: 'move',
-            direction: direction,
-            speed: currentSpeed
+            turn_angle: turn_angle,
+            left_speed: left_speed,
+            right_speed: right_speed,
         };
         websocket.send(JSON.stringify(message));
         console.log('已通过 WebSocket 发送移动命令:', message);
-    } else {
-        console.warn('WebSocket 未连接，尝试使用 HTTP 方式...');
-        // 回退到 HTTP 方式（如果需要）
-        fetch(`/control?command=${direction}&speed=${currentSpeed}`)
-            .then(response => {
-                if (response.ok) {
-                    console.log('移动命令通过 HTTP 发送成功');
-                } else {
-                    console.error('移动命令发送失败');
-                }
-            })
-            .catch(error => {
-                console.error('发送移动命令时出错:', error);
-            });
     }
 }
 
