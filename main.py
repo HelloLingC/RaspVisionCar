@@ -210,7 +210,7 @@ def cleanup_servers():
 
 def signal_handler(signum, frame):
     """信号处理器 for Ctrl+C"""
-    print("\nReceived exit signal (Ctrl+C), shutting down gracefully...")
+    print("\nReceived exit signal, shutting down gracefully...")
     shutdown_flag.set()
     cleanup_servers()
     sys.exit(0)
@@ -219,7 +219,7 @@ def main():
     global http_thread, ws_thread
     
     # 注册信号处理器
-    signal.signal(signal.SIGINT, signal_handler)
+    # signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     
     # 异步启动服务器
