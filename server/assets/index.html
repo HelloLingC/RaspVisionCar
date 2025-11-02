@@ -14,24 +14,25 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(to right, rgb(15, 23, 42), rgb(88, 28, 135), rgb(15, 23, 42));
+            /* background: linear-gradient(to right bottom, rgb(199, 210, 254), rgb(254, 202, 202), rgb(254, 249, 195)); */
             min-height: 100vh;
             padding: 20px;
-            color: #333;
+            color: #fff;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
+            /* background: rgba(255, 255, 255, 0.95); */
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
         .header {
-            background: #0b1020;
-            color: white;
+            /* background: #0b1020; */
+            color: #fff;
             padding: 20px;
             text-align: center;
         }
@@ -44,22 +45,47 @@
         }
 
         .status-bar {
-            background: #f8f9fa;
+            /* background: #f8f9fa; */
             padding: 15px;
             display: flex;
             justify-content: space-between;
             gap: 0.5rem;
             align-items: center;
-            border-bottom: 2px solid #e9ecef;
+            /* border-bottom: 2px solid #e9ecef; */
         }
 
-        .status-item {
-            flex: 1;
-            text-align: center;
-            padding: 10px 20px;
-            border-radius: 10px;
-            background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .glow-card {
+            width: 300px;
+            padding: 20px;
+            border-radius: 16px;
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+            color: #e0b3ff;
+            border: 1px solid #6a0dad;
+            box-shadow:
+                0 0 10px #6a0dad66,
+                /* 柔和的紫光 */
+                0 0 20px #b84cff44,
+                inset 0 0 10px #6a0dad22;
+            transition: all 0.3s ease;
+        }
+
+        .glow-card:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 0 15px #9b4dff99,
+                0 0 30px #b84cff66,
+                inset 0 0 15px #9b4dff33;
+        }
+
+        .glow-card h2 {
+            margin-bottom: 10px;
+            color: #c77dff;
+        }
+
+        .glow-card p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #d1aaff;
         }
 
         .status-value {
@@ -83,7 +109,7 @@
 
         .video-section,
         .control-section {
-            background: white;
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -160,8 +186,8 @@
             background: #ff6b6b;
         }
 
-        .speed-control {
-            margin: 20px 0;
+        .btn-center:hover {
+            background: #ff4444;
         }
 
         .speed-slider {
@@ -225,6 +251,43 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+
+        .black-purple-input {
+            width: 250px;
+            padding: 10px 14px;
+            font-size: 16px;
+            color: #e0b3ff;
+            /* 文字颜色：浅紫 */
+            background-color: #1a1a1a;
+            /* 背景：深黑 */
+            border: 2px solid #6a0dad;
+            /* 边框：紫色 */
+            border-radius: 8px;
+            /* 圆角 */
+            outline: none;
+            transition: all 0.3s ease;
+            /* 动画平滑 */
+        }
+
+        .black-purple-input::placeholder {
+            color: #7d3fc8;
+            /* placeholder：暗紫 */
+        }
+
+        .black-purple-input:focus {
+            border-color: #b84cff;
+            /* 聚焦时更亮的紫色 */
+            box-shadow: 0 0 8px #b84cff;
+            /* 发光效果 */
+            background-color: #121212;
+            /* 更深背景 */
+        }
+
+        .black-purple-input:hover {
+            border-color: #9b4dff;
+            /* hover轻微亮一点 */
+        }
+
 
         .footer {
             background: #343a40;
@@ -387,6 +450,36 @@
             transform: translateY(0);
         }
 
+        .glow-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(90deg, #6a0dad, #b84cff, #ff66ff);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow-move 4s ease-in-out infinite;
+            text-shadow:
+                0 0 8px #b84cff55,
+                0 0 16px #b84cff44,
+                0 0 24px #ff66ff33;
+        }
+
+        @keyframes glow-move {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -417,24 +510,24 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>RaspVisionCar Console</h1>
-            <p>Real-time</p>
+            <h1 class="glow-title">RaspVisionCar Console</h1>
+            <p>just for fun, with love ig</p>
         </div>
 
         <div class="status-bar">
-            <div class="status-item">
+            <div class="glow-card">
                 <div class="status-label">Status</div>
                 <div class="status-value" id="connection-status">Stopped</div>
             </div>
-            <div class="status-item">
+            <div class="glow-card">
                 <div class="status-label">Angle</div>
                 <div class="status-value" id="battery-level">85%</div>
             </div>
-            <div class="status-item">
+            <div class="glow-card">
                 <div class="status-label">Speed</div>
                 <div class="status-value" id="current-speed">0 km/h</div>
             </div>
-            <div class="status-item">
+            <div class="glow-card">
                 <div class="status-label">Uptime</div>
                 <div class="status-value" id="uptime">00:12:34</div>
             </div>
@@ -460,33 +553,28 @@
                         <button class="control-btn btn-down" onclick="moveDown()">↓</button>
                     </div>
 
-                    <div class="speed-control">
-                        <h3>Speed Control: <span id="speed-value">50%</span></h3>
-                        <input type="range" class="speed-slider" id="speed-slider" min="0" max="100" value="50"
-                            oninput="updateSpeed(this.value)">
-                    </div>
-
                     <!-- 移动参数设置 -->
-                    <div class="movement-params" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border: 1px solid #dee2e6;">
-                        <h3 style="margin-bottom: 15px; font-size: 1.1em; color: #495057;">移动参数设置</h3>
+                    <div class="movement-params"
+                        style="margin: 20px 0; padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <h3 style="margin-bottom: 15px; font-size: 1.1em;">移动参数设置</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                             <div style="display: flex; flex-direction: column; gap: 8px;">
-                                <label style="font-weight: 600; color: #495057; font-size: 0.9em;">转向角度: <span id="turn-angle-value">20</span>°</label>
+                                <label style="font-weight: 600; font-size: 0.9em;">转向角度: <span
+                                        id="turn-angle-value">20</span>°</label>
                                 <input type="range" id="turn-angle-input" min="0" max="50" value="20" step="1"
-                                    oninput="updateTurnAngle(this.value)" 
-                                    style="width: 100%; height: 8px; -webkit-appearance: none; appearance: none; background: linear-gradient(to right, #dee2e6 0%, #4CAF50 100%); outline: none; border-radius: 4px; cursor: pointer;">
+                                    oninput="updateTurnAngle(this.value)"
+                                    style="width: 100%; height: 8px; -webkit-appearance: none; appearance: none; background: linear-gradient(to right, #4CAF50 0%, #ad0d32 100%); outline: none; border-radius: 4px; cursor: pointer;">
                                 <input type="number" id="turn-angle-number" min="0" max="50" value="20" step="1"
-                                    oninput="updateTurnAngle(this.value)" 
-                                    style="padding: 5px 10px; border: 1px solid #dee2e6; border-radius: 5px; font-size: 0.9em;">
+                                    oninput="updateTurnAngle(this.value)" class="black-purple-input">
                             </div>
                             <div style="display: flex; flex-direction: column; gap: 8px;">
-                                <label style="font-weight: 600; color: #495057; font-size: 0.9em;">移动速度: <span id="move-speed-value">50</span></label>
+                                <label style="font-weight: 600; font-size: 0.9em;">移动速度: <span
+                                        id="move-speed-value">50</span></label>
                                 <input type="range" id="move-speed-input" min="0" max="100" value="50" step="1"
-                                    oninput="updateMoveSpeed(this.value)" 
-                                    style="width: 100%; height: 8px; -webkit-appearance: none; appearance: none; background: linear-gradient(to right, #dee2e6 0%, #4CAF50 100%); outline: none; border-radius: 4px; cursor: pointer;">
+                                    oninput="updateMoveSpeed(this.value)"
+                                    style="width: 100%; height: 8px; -webkit-appearance: none; appearance: none; background: linear-gradient(to right, #4CAF50 0%, #ad0d32 100%); outline: none; border-radius: 4px; cursor: pointer;">
                                 <input type="number" id="move-speed-number" min="0" max="100" value="50" step="1"
-                                    oninput="updateMoveSpeed(this.value)" 
-                                    style="padding: 5px 10px; border: 1px solid #dee2e6; border-radius: 5px; font-size: 0.9em;">
+                                    oninput="updateMoveSpeed(this.value)" class="black-purple-input">
                             </div>
                         </div>
                     </div>
