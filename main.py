@@ -56,8 +56,8 @@ def get_roi(image: Mat):
     # Define trapezoid points  左下 右下 右上 左上
     left_bottom = [10, height]
     right_bottom = [width-10, height]
-    left_top = [30, 120]
-    right_top = [width-30, 120]
+    left_top = [30, 270]
+    right_top = [width-30, 270]
     pts = np.array([left_bottom, right_bottom, right_top, left_top], np.int32)
     pts = pts.reshape((-1, 1, 2))
 
