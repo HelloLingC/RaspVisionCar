@@ -66,29 +66,35 @@ def get_roi(image: Mat):
     return roi, pts
 
 
+"""
+从图像底部向上扫描（逐行）
+找出当前行左右赛道的边缘点 → 取两者中点 → 逐层向上平滑跟踪中线 → 得出最终中线。
+"""
 def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
-    halfWidth= follow.shape[1] // 2
-    half = halfWidth  # 从下往上扫描赛道,最下端取图片中线为分割线
+    half_width= follow.shape[1] // 2
+    half = half_width  # 从下往上扫描赛道,最下端取图片中线为分割线
     for y in range(follow.shape[0] - 1, -1, -1):
         if SCREEN_HEIGHT - y > ROI_TOP_VERT:
             break
         # 加入分割线左右各半张图片的宽度作为约束,减小邻近赛道的干扰
-        if (mask[y][max(0,half-halfWidth):half] == np.zeros_like(mask[y][max(0,half-halfWidth):half])).all():  # 分割线左端无赛道
-            left = max(0,half-halfWidth)  # 取图片左边界
+        if (mask[y][max(0,half-half_width):half] == np.zeros_like(mask[y][max(0,half-half_width):half])).all():
+            # 分割线左端无赛道
+            left = max(0,half-half_width)  # 取图片左边界
         else:
             left = np.average(np.where(mask[y][0:half] == 255))  # 计算分割线左端平均位置
-        if (mask[y][half:min(follow.shape[1],half+halfWidth)] == np.zeros_like(mask[y][half:min(follow.shape[1],half+halfWidth)])).all():  # 分割线右端无赛道
-            right = min(follow.shape[1],half+halfWidth)  # 取图片右边界
+        if (mask[y][half:min(follow.shape[1],half+half_width)] == np.zeros_like(mask[y][half:min(follow.shape[1],half+half_width)])).all():
+            # 分割线右端无赛道
+            right = min(follow.shape[1],half+half_width)  # 取图片右边界
         else:
             right = np.average(np.where(mask[y][half:follow.shape[1]] == 255)) + half  # 计算分割线右端平均位置
  
         mid = (left + right) // 2  # 计算拟合中点
-        half = int(mid)  # 递归,从下往上确定分割线
-        follow[y, int(mid)] = 255  # 画出拟合中线
+        half = int(mid)  # 递归,从下往上确定拟合中点
+        follow[y, int(mid)] = 255  # 画出每行中点轨迹
 
         # print(f"y: {y}, mid: {mid}")
  
-        if y == 290:  # 设置指定提取中点的纵轴位置
+        if y == 290:  # 从指定高度取中线位置，for error calculation
             mid_output = int(mid)
  
     cv2.circle(follow, (mid_output, 290), 5, 255, -1)  # opencv为(x,y),画出指定提取中点
@@ -190,7 +196,8 @@ def main():
             ret, frame = cap.read()
             if not ret:
                 break
-            frame = cv2.resize(frame, (320, 240))
+            # frame = cv2.resize(frame, (320, 240))
+            frame = cv2.resize(frame, 640, 480)
 
             handle_one_frame(frame)
 
