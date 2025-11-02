@@ -6,6 +6,7 @@ import websockets
 import json
 import sys
 import os
+import threading
 
 # 添加项目根目录到Python路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -23,6 +24,11 @@ except ImportError as e:
 
 # 存储连接的客户端
 connected_clients = set()
+
+# 全局变量用于控制服务器
+websocket_server = None
+server_loop = None
+shutdown_event = threading.Event()
 
 def calculate_motor_speeds(direction: str, speed: int) -> tuple:
     """
@@ -56,7 +62,7 @@ async def handle_client(websocket, path):
     # 添加客户端到连接集合
     connected_clients.add(websocket)
     client_address = websocket.remote_address
-    print(f"客户端连接: {client_address}")
+    print(f"[WebSocket] 新客户端连接: {client_address}, 路径: {path}")
     
     try:
         # 发送欢迎消息
@@ -178,13 +184,17 @@ async def handle_client(websocket, path):
     except websockets.exceptions.ConnectionClosed:
         print(f"客户端断开连接: {client_address}")
     except Exception as e:
-        print(f"WebSocket 连接错误: {e}")
+        print(f"[WebSocket] 处理客户端 {client_address} 时发生错误: {e}")
+        import traceback
+        traceback.print_exc()
     finally:
         # 从连接集合中移除
         connected_clients.discard(websocket)
 
 async def main(host='0.0.0.0', port=5000):
     """启动 WebSocket 服务器"""
+    global websocket_server, server_loop
+    
     print(f'WebSocket 服务器启动: ws://{host}:{port}')
     
     # 初始化STM32串口连接
@@ -193,18 +203,99 @@ async def main(host='0.0.0.0', port=5000):
         serial_io.init_stm32_io()
     
     # 启动 WebSocket 服务器
-    async with websockets.serve(handle_client, host, port):
-        print(f"✅ WebSocket 服务器运行中，等待客户端连接...")
-        await asyncio.Future()  # 永远运行
+    try:
+        async with websockets.serve(handle_client, host, port) as server:
+            websocket_server = server
+            server_loop = asyncio.get_event_loop()
+            print(f"✅ WebSocket 服务器运行中，等待客户端连接...")
+            
+            # 等待关闭事件
+            while not shutdown_event.is_set():
+                await asyncio.sleep(0.1)
+                
+    except OSError as e:
+        if "Address already in use" in str(e):
+            print(f"错误: 端口 {port} 已被占用")
+        else:
+            print(f"WebSocket 服务器启动失败: {e}")
+        raise
+    except asyncio.CancelledError:
+        print("WebSocket 服务器收到取消信号")
+    finally:
+        # 关闭所有客户端连接
+        if connected_clients:
+            print(f"正在关闭 {len(connected_clients)} 个客户端连接...")
+            tasks = [client.close() for client in connected_clients.copy()]
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
+            connected_clients.clear()
+        shutdown_event.clear()
 
 def start_websocket_server(host='0.0.0.0', port=5000, debug=False):
     """启动 WebSocket 服务器（同步包装函数）"""
+    global server_loop
     try:
-        asyncio.run(main(host, port))
+        server_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(server_loop)
+        server_loop.run_until_complete(main(host, port))
     except KeyboardInterrupt:
-        print("\nWebSocket 服务器已停止")
+        print("\nWebSocket 服务器收到中断信号")
     except Exception as e:
         print(f"WebSocket 服务器错误: {e}")
+    finally:
+        # 清理资源
+        if server_loop and not server_loop.is_closed():
+            try:
+                # 取消所有任务
+                if not server_loop.is_running():
+                    pending = asyncio.all_tasks(server_loop)
+                    if pending:
+                        for task in pending:
+                            task.cancel()
+                        try:
+                            # 只等待很短的时间，避免阻塞
+                            server_loop.run_until_complete(asyncio.wait_for(
+                                asyncio.gather(*pending, return_exceptions=True), 
+                                timeout=1.0
+                            ))
+                        except (asyncio.TimeoutError, RuntimeError):
+                            pass
+            except Exception as e:
+                print(f"清理WebSocket服务器资源时出错: {e}")
+            finally:
+                try:
+                    if not server_loop.is_closed():
+                        server_loop.close()
+                except Exception:
+                    pass
+        server_loop = None
+
+def stop_websocket_server():
+    """停止WebSocket服务器"""
+    global websocket_server, server_loop
+    if not server_loop:
+        return
+        
+    print("正在关闭WebSocket服务器...")
+    
+    # 设置关闭事件
+    shutdown_event.set()
+    
+    # 如果有服务器实例，关闭它
+    if websocket_server and server_loop and not server_loop.is_closed() and server_loop.is_running():
+        try:
+            # 在事件循环中关闭服务器
+            future = asyncio.run_coroutine_threadsafe(websocket_server.close(), server_loop)
+            # 等待最多1秒
+            try:
+                future.result(timeout=1.0)
+            except Exception:
+                pass
+        except Exception as e:
+            print(f"关闭WebSocket服务器时出错: {e}")
+    
+    websocket_server = None
+    print("WebSocket服务器已关闭")
 
 if __name__ == '__main__':
     start_websocket_server()

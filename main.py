@@ -6,6 +6,8 @@ import server.http_server as http_server
 import server.websocket_server as websocket_server
 import asyncio
 import threading
+import signal
+import sys
 import serial_pi.serial_io as serial_io
 import serial_pi.motor as motor
 
@@ -183,7 +185,56 @@ def handle_one_frame(frame: Mat):
         cv2.imshow("Original", frame)
         cv2.imshow("Track Line", yellow_mask)
 
+# 全局变量存储服务器线程
+http_thread = None
+ws_thread = None
+shutdown_flag = threading.Event()
+
+def cleanup_servers():
+    """清理服务器资源"""
+    global http_thread, ws_thread
+    
+    print("\n正在关闭服务器...")
+    
+    # 停止HTTP服务器
+    try:
+        http_server.stop_http_server()
+    except Exception as e:
+        print(f"关闭HTTP服务器时出错: {e}")
+    
+    # 停止WebSocket服务器
+    try:
+        websocket_server.stop_websocket_server()
+    except Exception as e:
+        print(f"关闭WebSocket服务器时出错: {e}")
+    
+    # 等待线程结束（最多等待3秒）
+    if http_thread and http_thread.is_alive():
+        http_thread.join(timeout=3)
+        if http_thread.is_alive():
+            print("警告: HTTP服务器线程未在超时时间内结束")
+    
+    if ws_thread and ws_thread.is_alive():
+        ws_thread.join(timeout=3)
+        if ws_thread.is_alive():
+            print("警告: WebSocket服务器线程未在超时时间内结束")
+    
+    print("服务器清理完成")
+
+def signal_handler(signum, frame):
+    """信号处理器 for Ctrl+C"""
+    print("\nReceived exit signal (Ctrl+C), shutting down gracefully...")
+    shutdown_flag.set()
+    cleanup_servers()
+    sys.exit(0)
+
 def main():
+    global http_thread, ws_thread
+    
+    # 注册信号处理器
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
     # 异步启动服务器
     if(config.FRAME_OUTPUT_METHOD == 1):
         if not serial_io.init_stm32_io():
@@ -192,12 +243,12 @@ def main():
         print("STM32 Serial IO initialized")
 
         # 在单独线程中启动HTTP服务器（Flask是阻塞的）
-        http_thread = threading.Thread(target=http_server.start_http_server, daemon=True)
+        http_thread = threading.Thread(target=http_server.start_http_server, daemon=False)
         http_thread.start()
         print("HTTP Server started in background thread")
 
         # 在单独线程中启动WebSocket服务器（asyncio.run是阻塞的）
-        ws_thread = threading.Thread(target=websocket_server.start_websocket_server, daemon=True)
+        ws_thread = threading.Thread(target=websocket_server.start_websocket_server, daemon=False)
         ws_thread.start()
         print("WebSocket Server started in background thread")
 
@@ -219,20 +270,25 @@ def main():
         cv2.createTrackbar("V Lower", "Video Trackbar", 120, 255, nothing)
         cv2.createTrackbar("V Upper", "Video Trackbar", 255, 255, nothing)
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        frame = cv2.resize(frame, (640, 480))
+    try:
+        while not shutdown_flag.is_set():
+            ret, frame = cap.read()
+            if not ret:
+                break
+            frame = cv2.resize(frame, (640, 480))
 
-        handle_one_frame(frame)
+            handle_one_frame(frame)
 
-        # 按'q'退出
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
+            # 按'q'退出
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    finally:
+        # 清理资源
+        cap.release()
+        cv2.destroyAllWindows()
+        
+        # 关闭服务器
+        cleanup_servers()
 
 if __name__ == "__main__":
     main()
