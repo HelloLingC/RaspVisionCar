@@ -196,18 +196,18 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 def main():
-    # 注册信号处理器
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
-
     if(config.FRAME_OUTPUT_METHOD == 1):
+        # 注册信号处理器
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
+
         if not serial_io.init_stm32_io():
             print("STM32 Serial IO initialization failed")
             exit(1)
         print("STM32 Serial IO initialized")
 
-    # 启动服务器
-    server.start_servers()
+        # 启动服务器
+        server.start_servers()
         
     cap = cv2.VideoCapture(0)
     # cap = cv2.VideoCapture("test/1.mp4")

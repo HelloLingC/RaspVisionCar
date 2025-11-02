@@ -1,10 +1,11 @@
 from typing import Dict, Any
 import time
+import config
 from serial_pi.serial_io import get_stm32_io
 
 class Motor_Controller:
 
-    def send_turn_angle(self, angle: int) -> Dict[str, Any]:
+    def send_turn_angle(self, angle: int):
         try:
             # 限速：两次发送之间至少间隔 50ms
             # min_interval_seconds = 0.05
@@ -16,11 +17,14 @@ class Motor_Controller:
 
             # # 记录发送时间戳
             # self._last_turn_send_ts = time.monotonic()
-
-            return get_stm32_io().send_command(f'ta:{angle}\n')
+            if(config.ENABLE_TURN_ANGLE_UPDATE):
+                return get_stm32_io().send_command(f'ta:{angle}\n')
+            else:
+                pass
+                # print(f"Turn angle update is disabled, angle: {angle}")
         except Exception as e:
             # print(f"发送转向角度失败: {e}")
-            return None
+            print(f"Send turn angle failed: {e}")
 
     def set_motor_speed(self, left_speed: int, right_speed: int) -> Dict[str, Any]:
         """

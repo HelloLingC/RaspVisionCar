@@ -125,7 +125,7 @@ function move(turn_angle, left_speed, right_speed) {
     }
 }
 
-// 方向控制函数（使用变量）
+// 移动控制函数
 function moveUp() {
     move(0, moveSpeed, moveSpeed);
 }
@@ -320,8 +320,7 @@ function updateStatusData() {
     // 模拟速度数据
     const speedElement = document.getElementById('current-speed');
     if (speedElement) {
-        const speed = Math.floor(Math.random() * 20); // 0-20 km/h
-        speedElement.textContent = speed + ' km/h';
+        speedElement.textContent ='INF ++';
     }
 }
 
