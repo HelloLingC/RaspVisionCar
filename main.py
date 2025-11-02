@@ -54,7 +54,11 @@ def get_roi(image: Mat):
     mask = np.zeros(image.shape[:2], dtype=np.uint8)
 
     # Define trapezoid points  左下 右下 右上 左上
-    pts = np.array([[10, height], [width-10, height], [30, 120], [width-30, 120]], np.int32)
+    left_bottom = [10, height]
+    right_bottom = [width-10, height]
+    left_top = [30, 120]
+    right_top = [width-30, 120]
+    pts = np.array([left_bottom, right_bottom, right_top, left_top], np.int32)
     pts = pts.reshape((-1, 1, 2))
 
     # Fill the trapezoid area on mask
