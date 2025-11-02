@@ -6,6 +6,10 @@ let currentSpeed = 50;
 let uptimeInterval;
 let websocket = null;
 
+// 移动参数变量
+let turnAngle = 20;  // 转向角度值
+let moveSpeed = 50;  // 移动速度值
+
 // WebSocket 连接
 function connectWebSocket() {
     // 获取当前页面的主机和端口，构建 WebSocket URL
@@ -31,7 +35,7 @@ function connectWebSocket() {
                 if (data.type === 'connected') {
                     console.log(data.message);
                 } else if (data.type === 'move_ack') {
-                    console.log(`移动命令确认: ${data.direction}, 速度: ${data.speed}%`);
+                    console.log(`移动命令确认`);
                 } else if (data.type === 'error') {
                     console.error('WebSocket 错误:', data.message);
                     alert('错误: ' + data.message);
@@ -68,6 +72,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 初始化PID参数显示
     updatePidDisplay();
+    
+    // 初始化移动参数显示
+    updateTurnAngle(turnAngle);
+    updateMoveSpeed(moveSpeed);
     
     // 连接 WebSocket
     connectWebSocket();
@@ -115,6 +123,45 @@ function move(turn_angle, left_speed, right_speed) {
         websocket.send(JSON.stringify(message));
         console.log('已通过 WebSocket 发送移动命令:', message);
     }
+}
+
+// 方向控制函数（使用变量）
+function moveUp() {
+    move(0, moveSpeed, moveSpeed);
+}
+
+function moveDown() {
+    move(0, -moveSpeed, -moveSpeed);
+}
+
+function moveLeft() {
+    move(turnAngle, moveSpeed, moveSpeed);
+}
+
+function moveRight() {
+    move(-turnAngle, moveSpeed, moveSpeed);
+}
+
+function moveStop() {
+    move(0, 0, 0);
+}
+
+// 更新转向角度
+function updateTurnAngle(value) {
+    turnAngle = parseInt(value);
+    document.getElementById('turn-angle-value').textContent = turnAngle;
+    document.getElementById('turn-angle-input').value = turnAngle;
+    document.getElementById('turn-angle-number').value = turnAngle;
+    console.log(`转向角度更新为: ${turnAngle}°`);
+}
+
+// 更新移动速度
+function updateMoveSpeed(value) {
+    moveSpeed = parseInt(value);
+    document.getElementById('move-speed-value').textContent = moveSpeed;
+    document.getElementById('move-speed-input').value = moveSpeed;
+    document.getElementById('move-speed-number').value = moveSpeed;
+    console.log(`移动速度更新为: ${moveSpeed}`);
 }
 
 function startCar() {

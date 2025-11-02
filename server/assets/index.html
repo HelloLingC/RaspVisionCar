@@ -453,17 +453,42 @@
                 <h2>Control</h2>
                 <div class="control-panel">
                     <div class="d-pad">
-                        <button class="control-btn btn-up" onclick="move('forward')">↑</button>
-                        <button class="control-btn btn-left" onclick="move('left')">←</button>
-                        <button class="control-btn btn-center">●</button>
-                        <button class="control-btn btn-right" onclick="move('right')">→</button>
-                        <button class="control-btn btn-down" onclick="move('backward')">↓</button>
+                        <button class="control-btn btn-up" onclick="moveUp()">↑</button>
+                        <button class="control-btn btn-left" onclick="moveLeft()">←</button>
+                        <button class="control-btn btn-center" onclick="moveStop()">●</button>
+                        <button class="control-btn btn-right" onclick="moveRight()">→</button>
+                        <button class="control-btn btn-down" onclick="moveDown()">↓</button>
                     </div>
 
                     <div class="speed-control">
                         <h3>Speed Control: <span id="speed-value">50%</span></h3>
                         <input type="range" class="speed-slider" id="speed-slider" min="0" max="100" value="50"
                             oninput="updateSpeed(this.value)">
+                    </div>
+
+                    <!-- 移动参数设置 -->
+                    <div class="movement-params" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border: 1px solid #dee2e6;">
+                        <h3 style="margin-bottom: 15px; font-size: 1.1em; color: #495057;">移动参数设置</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <label style="font-weight: 600; color: #495057; font-size: 0.9em;">转向角度: <span id="turn-angle-value">20</span>°</label>
+                                <input type="range" id="turn-angle-input" min="0" max="50" value="20" step="1"
+                                    oninput="updateTurnAngle(this.value)" 
+                                    style="width: 100%; height: 8px; -webkit-appearance: none; appearance: none; background: linear-gradient(to right, #dee2e6 0%, #4CAF50 100%); outline: none; border-radius: 4px; cursor: pointer;">
+                                <input type="number" id="turn-angle-number" min="0" max="50" value="20" step="1"
+                                    oninput="updateTurnAngle(this.value)" 
+                                    style="padding: 5px 10px; border: 1px solid #dee2e6; border-radius: 5px; font-size: 0.9em;">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <label style="font-weight: 600; color: #495057; font-size: 0.9em;">移动速度: <span id="move-speed-value">50</span></label>
+                                <input type="range" id="move-speed-input" min="0" max="100" value="50" step="1"
+                                    oninput="updateMoveSpeed(this.value)" 
+                                    style="width: 100%; height: 8px; -webkit-appearance: none; appearance: none; background: linear-gradient(to right, #dee2e6 0%, #4CAF50 100%); outline: none; border-radius: 4px; cursor: pointer;">
+                                <input type="number" id="move-speed-number" min="0" max="100" value="50" step="1"
+                                    oninput="updateMoveSpeed(this.value)" 
+                                    style="padding: 5px 10px; border: 1px solid #dee2e6; border-radius: 5px; font-size: 0.9em;">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="action-buttons">
