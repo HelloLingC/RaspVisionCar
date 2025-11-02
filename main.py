@@ -19,6 +19,7 @@ UPTIME_START_WHEN = 0
 def nothing(x):
     pass
 
+# HSV 提取黄色赛道线
 def get_yellow_mask(frame):
     frame = cv2.GaussianBlur(frame, (7, 7), 0)
 
@@ -96,55 +97,12 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
  
     return follow, error  # error为正数右转,为负数左转
 
-# def mid(frame: Mat, edges: Mat) -> tuple[Mat, int]:
-#     height, width = edges.shape[:2]
-
-#     # 选取底部某一水平线
-#     scan_y = int(height * 0.75)
-
-#     # 提取该行的边缘像素（非零即检测到线）
-#     scan_line = edges[scan_y, :]
-
-#     # 找出所有非零点的 x 坐标
-#     white_x = np.where(scan_line > 0)[0]
-
-#     if len(white_x) < 2:
-#         # 检测不到左右两条线，返回原图和 0 偏差
-#         return frame, 0
-
-#     # 左右两条线的最左最右点
-#     left_x = white_x[0]
-#     right_x = white_x[-1]
-
-#     # 计算赛道中点
-#     mid_x = (left_x + right_x) // 2
-
-#     # 图像中心
-#     center_x = width // 2
-
-#     # 计算偏差（右偏为正，左偏为负）
-#     error = mid_x - center_x
-
-#     # --- 可视化部分 ---
-#     # 画出扫描线
-#     cv2.line(frame, (0, scan_y), (width, scan_y), (255, 255, 0), 1)
-#     # 左右线
-#     cv2.line(frame, (left_x, scan_y-5), (left_x, scan_y+5), (0, 255, 0), 3)
-#     cv2.line(frame, (right_x, scan_y-5), (right_x, scan_y+5), (0, 255, 0), 3)
-#     # 中点
-#     cv2.circle(frame, (mid_x, scan_y), 5, (0, 0, 255), -1)
-#     # 中心线h
-#     cv2.line(frame, (center_x, 0), (center_x, height), (255, 0, 0), 1)
-
-#     return frame, error
-
-
-
 def handle_one_frame(frame: Mat):
     # TODO: Add light detection
     # light_detect.handle_lights(frame)
 
-    roi, pts = get_roi(frame)
+    # roi, pts = get_roi(frame)
+    roi = frame
     roi = cv2.GaussianBlur(roi, (5, 5), 0)
 
     yellow_mask = get_yellow_mask(roi)
@@ -169,7 +127,7 @@ def handle_one_frame(frame: Mat):
     frame[mask] = [0, 0, 255]
 
     # Draw ROI region
-    cv2.polylines(frame, [pts], isClosed=True, color=(255, 0, 55), thickness=1)
+    # cv2.polylines(frame, [pts], isClosed=True, color=(255, 0, 55), thickness=1)
 
     follow, error = mid(frame, edges)
     cv2.putText(frame, f"Turn: {error}", (config.DEBUG_LEFT_MARGIN, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(155,55,0), 2)
@@ -232,7 +190,7 @@ def main():
             ret, frame = cap.read()
             if not ret:
                 break
-            frame = cv2.resize(frame, (640, 480))
+            frame = cv2.resize(frame, (320, 240))
 
             handle_one_frame(frame)
 
