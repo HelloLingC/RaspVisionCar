@@ -242,33 +242,6 @@ def start_websocket_server(host='0.0.0.0', port=5000, debug=False):
         print("\nWebSocket 服务器收到中断信号")
     except Exception as e:
         print(f"WebSocket 服务器错误: {e}")
-    finally:
-        # 清理资源
-        if server_loop and not server_loop.is_closed():
-            try:
-                # 取消所有任务
-                if not server_loop.is_running():
-                    pending = asyncio.all_tasks(server_loop)
-                    if pending:
-                        for task in pending:
-                            task.cancel()
-                        try:
-                            # 只等待很短的时间，避免阻塞
-                            server_loop.run_until_complete(asyncio.wait_for(
-                                asyncio.gather(*pending, return_exceptions=True), 
-                                timeout=1.0
-                            ))
-                        except (asyncio.TimeoutError, RuntimeError):
-                            pass
-            except Exception as e:
-                print(f"清理WebSocket服务器资源时出错: {e}")
-            finally:
-                try:
-                    if not server_loop.is_closed():
-                        server_loop.close()
-                except Exception:
-                    pass
-        server_loop = None
 
 def stop_websocket_server():
     """停止WebSocket服务器"""

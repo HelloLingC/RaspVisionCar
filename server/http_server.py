@@ -115,6 +115,10 @@ def start_http_server(host='0.0.0.0', port=8080, debug=False):
     print(f'HTTP Server started running on {host}:{port}')
     app.run(host=host, port=port, debug=debug, threaded=True)
 
+def stop_http_server():
+    """Stop HTTP server"""
+    app.stop()
+    print("HTTP Server stopped")
 
 if __name__ == '__main__':
     start_http_server()
