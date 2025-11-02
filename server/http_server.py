@@ -118,7 +118,7 @@ def start_http_server(host='0.0.0.0', port=8080, debug=False):
 
     # 创建可控制的服务器实例
     server = make_server(host, port, app, threaded=True)
-    print(f'HTTP Server started running on {host}:{port}')
+    print(f'HTTP Server started running on http://{host}:{port}')
     
     # 启动服务器（阻塞调用）
     server.serve_forever()

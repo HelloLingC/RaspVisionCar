@@ -57,12 +57,12 @@ def calculate_motor_speeds(direction: str, speed: int) -> tuple:
     else:
         return (0, 0)
 
-async def handle_client(websocket, path):
+async def handle_client(websocket):
     """处理客户端 WebSocket 连接"""
     # 添加客户端到连接集合
     connected_clients.add(websocket)
     client_address = websocket.remote_address
-    print(f"[WebSocket] 新客户端连接: {client_address}, 路径: {path}")
+    print(f"[WebSocket] 新客户端连接: {client_address}")
     
     try:
         # 发送欢迎消息
