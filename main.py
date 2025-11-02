@@ -179,14 +179,11 @@ def handle_one_frame(frame: Mat):
     if(config.FRAME_OUTPUT_METHOD == 1):
         success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
         if success:
-            http_server.output.write(jpeg_data.tobytes())
+            server.http_server.output.write(jpeg_data.tobytes())
     elif(config.FRAME_OUTPUT_METHOD == 2):
         cv2.imshow("Original", frame)
         cv2.imshow("Track Line", yellow_mask)
 
-# 全局变量存储服务器线程
-http_thread = None
-ws_thread = None
 shutdown_flag = threading.Event()
 
 
@@ -199,29 +196,19 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 def main():
-    global http_thread, ws_thread
-    
     # 注册信号处理器
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
-    
-    # 异步启动服务器
+
     if(config.FRAME_OUTPUT_METHOD == 1):
         if not serial_io.init_stm32_io():
             print("STM32 Serial IO initialization failed")
             exit(1)
         print("STM32 Serial IO initialized")
 
-        # 在单独线程中启动HTTP服务器（Flask是阻塞的）
-        http_thread = threading.Thread(target=server.http_server.start_http_server, daemon=False)
-        http_thread.start()
-        print("HTTP Server started in background thread")
-
-        # 在单独线程中启动WebSocket服务器（asyncio.run是阻塞的）
-        ws_thread = threading.Thread(target=server.websocket_server.start_websocket_server, daemon=False)
-        ws_thread.start()
-        print("WebSocket Server started in background thread")
-
+    # 启动服务器
+    server.start_servers()
+        
     cap = cv2.VideoCapture(0)
     # cap = cv2.VideoCapture("test/1.mp4")
     # cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
