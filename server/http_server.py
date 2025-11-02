@@ -7,6 +7,7 @@ import io
 import sys
 import os
 import serial_pi.serial_io as serial_io
+from werkzeug.serving import make_server
 
 # 添加项目根目录到Python路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -26,6 +27,9 @@ ASSETS_DIR = "assets"
 
 # Global variable for streaming output
 output = None
+
+# Global variable for server instance
+server = None
 
 class StreamingOutput(io.BufferedIOBase):
     def __init__(self):
@@ -109,16 +113,41 @@ def stream():
 
 def start_http_server(host='0.0.0.0', port=8080, debug=False):
     """Start HTTP server"""
-    global output
+    global output, server
     output = StreamingOutput()
 
+    # 创建可控制的服务器实例
+    server = make_server(host, port, app, threaded=True)
     print(f'HTTP Server started running on {host}:{port}')
-    app.run(host=host, port=port, debug=debug, threaded=True)
+    
+    # 启动服务器（阻塞调用）
+    server.serve_forever()
 
 def stop_http_server():
     """Stop HTTP server"""
-    app.stop()
-    print("HTTP Server stopped")
+    global server, output
+    
+    if server is None:
+        print("HTTP Server is not running")
+        return
+    
+    try:
+        print("正在关闭HTTP服务器...")
+        # 关闭服务器
+        server.shutdown()
+        server = None
+        
+        # 清理输出流
+        if output is not None:
+            with output.condition:
+                output.frame = None
+                output.condition.notify_all()
+            output = None
+        
+        print("HTTP Server已停止")
+    except Exception as e:
+        print(f"关闭HTTP服务器时出错: {e}")
+        raise
 
 if __name__ == '__main__':
     start_http_server()

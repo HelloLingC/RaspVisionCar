@@ -207,19 +207,6 @@ def cleanup_servers():
         websocket_server.stop_websocket_server()
     except Exception as e:
         print(f"关闭WebSocket服务器时出错: {e}")
-    
-    # 等待线程结束（最多等待3秒）
-    if http_thread and http_thread.is_alive():
-        http_thread.join(timeout=3)
-        if http_thread.is_alive():
-            print("警告: HTTP服务器线程未在超时时间内结束")
-    
-    if ws_thread and ws_thread.is_alive():
-        ws_thread.join(timeout=3)
-        if ws_thread.is_alive():
-            print("警告: WebSocket服务器线程未在超时时间内结束")
-    
-    print("服务器清理完成")
 
 def signal_handler(signum, frame):
     """信号处理器 for Ctrl+C"""
