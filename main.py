@@ -5,6 +5,7 @@ import config
 import server.http_server as http_server
 import server.websocket_server as websocket_server
 import asyncio
+import threading
 import serial_pi.serial_io as serial_io
 import serial_pi.motor as motor
 
@@ -177,7 +178,7 @@ def handle_one_frame(frame: Mat):
     if(config.FRAME_OUTPUT_METHOD == 1):
         success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
         if success:
-            server.output.write(jpeg_data.tobytes())
+            http_server.output.write(jpeg_data.tobytes())
     elif(config.FRAME_OUTPUT_METHOD == 2):
         cv2.imshow("Original", frame)
         cv2.imshow("Track Line", yellow_mask)
@@ -190,9 +191,15 @@ def main():
             exit(1)
         print("STM32 Serial IO initialized")
 
-        asyncio.run(http_server.start_http_server())
-        websocket_server.start_websocket_server()
-        print("WebSocket Server will be running asynchronously")
+        # 在单独线程中启动HTTP服务器（Flask是阻塞的）
+        http_thread = threading.Thread(target=http_server.start_http_server, daemon=True)
+        http_thread.start()
+        print("HTTP Server started in background thread")
+
+        # 在单独线程中启动WebSocket服务器（asyncio.run是阻塞的）
+        ws_thread = threading.Thread(target=websocket_server.start_websocket_server, daemon=True)
+        ws_thread.start()
+        print("WebSocket Server started in background thread")
 
     cap = cv2.VideoCapture(0)
     # cap = cv2.VideoCapture("test/1.mp4")
