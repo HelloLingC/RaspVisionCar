@@ -75,46 +75,6 @@ def control():
     
     return response
 
-@app.route('/pid')
-def pid_control():
-    """PID参数调整接口"""
-    direction = request.args.get('direction', '')  # 'direction' 或 'speed'
-    kp = request.args.get('kp', '0')
-    ki = request.args.get('ki', '0')
-    kd = request.args.get('kd', '0')
-    
-    try:
-        # 验证参数
-        kp_val = float(kp)
-        ki_val = float(ki)
-        kd_val = float(kd)
-        
-        if direction not in ['direction', 'speed']:
-            return Response('Invalid direction parameter', status=400)
-        
-        # 调用电机控制器的PID设置方法
-        print(f"PID参数设置 - 方向: {direction}, Kp: {kp_val}, Ki: {ki_val}, Kd: {kd_val}")
-        
-        if motor_controller:
-            try:
-                motor_controller.set_pid_params(direction, kp_val, ki_val, kd_val)
-                print(f"PID参数已发送到STM32: {direction} - Kp:{kp_val}, Ki:{ki_val}, Kd:{kd_val}")
-            except Exception as e:
-                print(f"发送PID参数到STM32时出错: {e}")
-                return Response('PID参数发送失败', status=500)
-        else:
-            print("警告: 电机控制器未初始化，PID参数未发送")
-        
-        response = Response('PID参数设置成功')
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
-        
-    except ValueError:
-        return Response('Invalid PID parameters', status=400)
-    except Exception as e:
-        print(f"PID参数设置错误: {e}")
-        return Response('PID参数设置失败', status=500)
-
 @app.route('/stream.mjpg')
 def stream():
     def generate():

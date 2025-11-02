@@ -4,6 +4,57 @@
 // 全局变量
 let currentSpeed = 50;
 let uptimeInterval;
+let websocket = null;
+
+// WebSocket 连接
+function connectWebSocket() {
+    // 获取当前页面的主机和端口，构建 WebSocket URL
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = window.location.hostname;
+    const wsPort = '5000'; // WebSocket 服务器端口
+    const wsUrl = `${wsProtocol}//${wsHost}:${wsPort}`;
+    
+    console.log(`正在连接 WebSocket: ${wsUrl}`);
+    
+    try {
+        websocket = new WebSocket(wsUrl);
+        
+        websocket.onopen = function(event) {
+            console.log('WebSocket 连接成功');
+        };
+        
+        websocket.onmessage = function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                console.log('收到 WebSocket 消息:', data);
+                
+                if (data.type === 'connected') {
+                    console.log(data.message);
+                } else if (data.type === 'move_ack') {
+                    console.log(`移动命令确认: ${data.direction}, 速度: ${data.speed}%`);
+                } else if (data.type === 'error') {
+                    console.error('WebSocket 错误:', data.message);
+                    alert('错误: ' + data.message);
+                }
+            } catch (e) {
+                console.error('解析 WebSocket 消息失败:', e);
+            }
+        };
+        
+        websocket.onerror = function(error) {
+            console.error('WebSocket 错误:', error);
+        };
+        
+        websocket.onclose = function(event) {
+            console.log('WebSocket 连接关闭，尝试重新连接...');
+            // 3秒后尝试重新连接
+            setTimeout(connectWebSocket, 3000);
+        };
+    } catch (error) {
+        console.error('创建 WebSocket 连接失败:', error);
+        // 如果 WebSocket 不支持，可以回退到 HTTP
+    }
+}
 
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
@@ -17,6 +68,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 初始化PID参数显示
     updatePidDisplay();
+    
+    // 连接 WebSocket
+    connectWebSocket();
 });
 
 // 连接状态管理
@@ -50,18 +104,30 @@ function startUptimeCounter() {
 function move(direction) {
     console.log(`移动命令: ${direction}, 速度: ${currentSpeed}`);
 
-    // 发送控制命令到后端
-    fetch(`/control?command=${direction}&speed=${currentSpeed}`)
-        .then(response => {
-            if (response.ok) {
-                console.log(`移动命令发送成功: ${direction}`);
-            } else {
-                console.error('移动命令发送失败');
-            }
-        })
-        .catch(error => {
-            console.error('发送移动命令时出错:', error);
-        });
+    // 通过 WebSocket 发送移动命令
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        const message = {
+            type: 'move',
+            direction: direction,
+            speed: currentSpeed
+        };
+        websocket.send(JSON.stringify(message));
+        console.log('已通过 WebSocket 发送移动命令:', message);
+    } else {
+        console.warn('WebSocket 未连接，尝试使用 HTTP 方式...');
+        // 回退到 HTTP 方式（如果需要）
+        fetch(`/control?command=${direction}&speed=${currentSpeed}`)
+            .then(response => {
+                if (response.ok) {
+                    console.log('移动命令通过 HTTP 发送成功');
+                } else {
+                    console.error('移动命令发送失败');
+                }
+            })
+            .catch(error => {
+                console.error('发送移动命令时出错:', error);
+            });
+    }
 }
 
 function startCar() {
@@ -232,5 +298,9 @@ setInterval(updateStatusData, 2000);
 window.addEventListener('beforeunload', function() {
     if (uptimeInterval) {
         clearInterval(uptimeInterval);
+    }
+    // 关闭 WebSocket 连接
+    if (websocket) {
+        websocket.close();
     }
 });

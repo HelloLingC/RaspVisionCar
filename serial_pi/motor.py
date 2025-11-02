@@ -33,10 +33,16 @@ class Motor_Controller:
         Returns:
             执行结果
         """
-        return self.stm32_io.send_command(f'LS:{left_speed},RS:{right_speed}')
+        stm32_io = get_stm32_io()
+        if stm32_io:
+            return stm32_io.send_command(f'LS:{left_speed},RS:{right_speed}\n')
+        return None
     
     def set_pid_params(self, direction: str, kp: float, ki: float, kd: float):
-        self.stm32_io.send_command(f'PID:{direction}:{kp}:{ki}:{kd}')
+        stm32_io = get_stm32_io()
+        if stm32_io:
+            return stm32_io.send_command(f'PID:{direction}:{kp}:{ki}:{kd}\n')
+        return None
 
 
 motor_controller = Motor_Controller()

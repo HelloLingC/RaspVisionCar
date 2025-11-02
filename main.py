@@ -2,8 +2,9 @@ import cv2
 from cv2.mat_wrapper import Mat
 import numpy as np
 import config
-import server.http_server as server
-import threading
+import server.http_server as http_server
+import server.websocket_server as websocket_server
+import asyncio
 import serial_pi.serial_io as serial_io
 import serial_pi.motor as motor
 
@@ -189,9 +190,9 @@ def main():
             exit(1)
         print("STM32 Serial IO initialized")
 
-        server_thread = threading.Thread(target=server.start_http_server, daemon=True)
-        server_thread.start()
-        print("Console Server will be running asynchronously")
+        asyncio.run(http_server.start_http_server())
+        websocket_server.start_websocket_server()
+        print("WebSocket Server will be running asynchronously")
 
     cap = cv2.VideoCapture(0)
     # cap = cv2.VideoCapture("test/1.mp4")
