@@ -13,10 +13,10 @@ import serial_pi.serial_io as serial_io
 import serial_pi.motor as motor
 import config
 
-# SCREEN_WIDTH = 640
-# SCREEN_HEIGHT = 480
-SCREEN_WIDTH = 320
-SCREEN_HEIGHT = 290
+SCREEN_WIDTH = 640
+SCREEN_HEIGHT = 480
+# SCREEN_WIDTH = 320
+# SCREEN_HEIGHT = 290
 
 UPTIME_START_WHEN = 0
 
@@ -125,7 +125,7 @@ def handle_one_frame(frame: Mat):
 
     yellow_mask = get_yellow_mask(roi)
 
-    edges = cv2.Canny(yellow_mask, 10, 20)
+    edges = cv2.Canny(yellow_mask, 100, 150)
     # lines = cv2.HoughLinesP(
     #     edges,
     #     rho=1,
