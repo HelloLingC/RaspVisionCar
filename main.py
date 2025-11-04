@@ -216,8 +216,7 @@ def main():
             if config.RECORD_VIDEO:
                 out.write(frame)
             
-            # handle_one_frame(frame)
-            cv2.imshow("Original", frame)
+            handle_one_frame(frame)
 
             # 按'q'退出
             if cv2.waitKey(1) & 0xFF == ord('q'):
