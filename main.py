@@ -211,7 +211,7 @@ def main():
             ret, frame = cap.read()
             if not ret:
                 break
-            # frame = cv2.resize(frame, (SCREEN_WIDTH, SCREEN_HEIGHT))
+            frame = cv2.resize(frame, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
             if config.RECORD_VIDEO:
                 out.write(frame)
