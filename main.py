@@ -1,7 +1,9 @@
+from dotenv import load_dotenv
+load_dotenv()  # 必须在所有导入之前加载 .env 文件
+
 import cv2
 from cv2.mat_wrapper import Mat
 import numpy as np
-import config
 import server as server
 import asyncio
 import threading
@@ -9,10 +11,12 @@ import signal
 import sys
 import serial_pi.serial_io as serial_io
 import serial_pi.motor as motor
+import config
 
-SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 480
-ROI_TOP_VERT = 380
+# SCREEN_WIDTH = 640
+# SCREEN_HEIGHT = 480
+SCREEN_WIDTH = 320
+SCREEN_HEIGHT = 290
 
 UPTIME_START_WHEN = 0
 
@@ -48,6 +52,7 @@ def get_yellow_mask(frame):
     # mask = cv2.medianBlur(mask, 9)  # 中值滤波
     return mask
 
+ROI_TOP_VERT = 30 # 从上往下第 x 行以下为ROI
 def get_roi(image: Mat):
     height, width = image.shape[:2]
     # 梯形ROI
@@ -56,8 +61,8 @@ def get_roi(image: Mat):
     # Define trapezoid points  左下 右下 右上 左上
     left_bottom = [10, height]
     right_bottom = [width-10, height]
-    left_top = [30, 270]
-    right_top = [width-30, 270]
+    left_top = [30, ROI_TOP_VERT]
+    right_top = [width-30, ROI_TOP_VERT]
     pts = np.array([left_bottom, right_bottom, right_top, left_top], np.int32)
     pts = pts.reshape((-1, 1, 2))
 
@@ -77,8 +82,11 @@ def get_roi(image: Mat):
 def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
     half_width= follow.shape[1] // 2
     half = half_width  # 从下往上扫描赛道,最下端取图片中线为分割线
+    scan_times = 0
+    print(SCREEN_HEIGHT - ROI_TOP_VERT)
     for y in range(follow.shape[0] - 1, -1, -1):
-        if SCREEN_HEIGHT - y > ROI_TOP_VERT:
+        scan_times += 1
+        if scan_times > SCREEN_HEIGHT - ROI_TOP_VERT:
             break
         # 加入分割线左右各半张图片的宽度作为约束,减小邻近赛道的干扰
         if (mask[y][max(0,half-half_width):half] == np.zeros_like(mask[y][max(0,half-half_width):half])).all():
@@ -96,12 +104,12 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
         half = int(mid)  # 递归,从下往上确定拟合中点
         follow[y, int(mid)] = 255  # 画出每行中点轨迹
 
-        # print(f"y: {y}, mid: {mid}")
+        print(f"y: {y}, mid: {mid}")
  
-        if y == 290:  # 从指定高度取中线位置，for error calculation
+        if y == 260:  # 从指定高度取中线位置，for error calculation
             mid_output = int(mid)
  
-    cv2.circle(follow, (mid_output, 290), 5, 255, -1)  # opencv为(x,y),画出指定提取中点
+    cv2.circle(follow, (mid_output, 400), 5, 255, -1)  # opencv为(x,y),画出指定提取中点
  
     error = follow.shape[1] // 2 - mid_output  # 计算图片中点与指定提取中点的误差
  
@@ -176,7 +184,8 @@ def main():
 
         # 启动服务器
         server.start_servers()
-        
+
+    
     cap = cv2.VideoCapture(0)
     # cap = cv2.VideoCapture("test/1.mp4")
     # cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
@@ -184,7 +193,9 @@ def main():
     # cap.set(cv2.CAP_PROP_SATURATION, 3)
     actual_fps = cap.get(cv2.CAP_PROP_FPS)
     print(f"Camera actual FPS: {actual_fps}")
-    cap.set(cv2.CAP_PROP_FPS, 30)
+
+    if config.RECORD_VIDEO:
+        out = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'MJPG'), actual_fps, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     if config.SHOW_TRACKBAR:
         cv2.namedWindow("Video Trackbar", cv2.WINDOW_NORMAL)
@@ -200,10 +211,13 @@ def main():
             ret, frame = cap.read()
             if not ret:
                 break
-            # frame = cv2.resize(frame, (320, 240))
-            frame = cv2.resize(frame, (640, 480))
+            frame = cv2.resize(frame, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-            handle_one_frame(frame)
+            if config.RECORD_VIDEO:
+                out.write(frame)
+            
+            # handle_one_frame(frame)
+            cv2.imshow("Original", frame)
 
             # 按'q'退出
             if cv2.waitKey(1) & 0xFF == ord('q'):
