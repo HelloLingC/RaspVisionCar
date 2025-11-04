@@ -83,7 +83,6 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
     half_width= follow.shape[1] // 2
     half = half_width  # 从下往上扫描赛道,最下端取图片中线为分割线
     scan_times = 0
-    print(SCREEN_HEIGHT - ROI_TOP_VERT)
     for y in range(follow.shape[0] - 1, -1, -1):
         scan_times += 1
         if scan_times > SCREEN_HEIGHT - ROI_TOP_VERT:
@@ -222,7 +221,10 @@ def main():
                 times = 0;
                 handle_one_frame(frame)
             else:
-                server.http_server.output.write(frame.tobytes())
+                if(config.FRAME_OUTPUT_METHOD == 1):
+                    success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
+                    if success:
+                        server.http_server.output.write(jpeg_data.tobytes())
 
             times +=1;
 
