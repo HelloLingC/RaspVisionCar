@@ -104,7 +104,7 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
         half = int(mid)  # 递归,从下往上确定拟合中点
         follow[y, int(mid)] = 255  # 画出每行中点轨迹
 
-        print(f"y: {y}, mid: {mid}")
+        # print(f"y: {y}, mid: {mid}")
  
         if y == 260:  # 从指定高度取中线位置，for error calculation
             mid_output = int(mid)
@@ -212,8 +212,7 @@ def main():
             ret, frame = cap.read()
             if not ret:
                 break
-            
-            
+                    
             frame = cv2.resize(frame, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
             if config.RECORD_VIDEO:
