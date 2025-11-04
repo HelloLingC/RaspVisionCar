@@ -52,7 +52,7 @@ def get_yellow_mask(frame):
     # mask = cv2.medianBlur(mask, 9)  # 中值滤波
     return mask
 
-ROI_TOP_VERT = 30 # 从上往下第 x 行以下为ROI
+ROI_TOP_VERT = 100 # 从上往下第 x 行以下为ROI
 def get_roi(image: Mat):
     height, width = image.shape[:2]
     # 梯形ROI
@@ -62,7 +62,7 @@ def get_roi(image: Mat):
     left_bottom = [10, height]
     right_bottom = [width-10, height]
     left_top = [30, ROI_TOP_VERT]
-    right_top = [width-30, ROI_TOP_VERT]
+    right_top = [0, ROI_TOP_VERT]
     pts = np.array([left_bottom, right_bottom, right_top, left_top], np.int32)
     pts = pts.reshape((-1, 1, 2))
 
