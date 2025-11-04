@@ -13,10 +13,10 @@ import serial_pi.serial_io as serial_io
 import serial_pi.motor as motor
 import config
 
-SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 480
-# SCREEN_WIDTH = 320
-# SCREEN_HEIGHT = 290
+# SCREEN_WIDTH = 640
+# SCREEN_HEIGHT = 480
+SCREEN_WIDTH = 320
+SCREEN_HEIGHT = 240
 
 UPTIME_START_WHEN = 0
 
@@ -217,16 +217,7 @@ def main():
             if config.RECORD_VIDEO:
                 out.write(frame)
 
-            if times >= 3:
-                times = 0;
-                handle_one_frame(frame)
-            else:
-                if(config.FRAME_OUTPUT_METHOD == 1):
-                    success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
-                    if success:
-                        server.http_server.output.write(jpeg_data.tobytes())
-
-            times +=1;
+            handle_one_frame(frame)
 
             # 按'q'退出
             if cv2.waitKey(1) & 0xFF == ord('q'):
