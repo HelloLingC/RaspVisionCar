@@ -105,7 +105,7 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
 
         # print(f"y: {y}, mid: {mid}")
  
-        if y == 260:  # 从指定高度取中线位置，for error calculation
+        if y == 100:  # 从指定高度取中线位置，for error calculation
             mid_output = int(mid)
  
     cv2.circle(follow, (mid_output, 400), 5, 255, -1)  # opencv为(x,y),画出指定提取中点
