@@ -125,7 +125,7 @@ def handle_one_frame(frame: Mat):
 
     yellow_mask = get_yellow_mask(roi)
 
-    edges = cv2.Canny(yellow_mask, 25, 50)
+    edges = cv2.Canny(yellow_mask, 10, 20)
     # lines = cv2.HoughLinesP(
     #     edges,
     #     rho=1,
