@@ -62,7 +62,7 @@ def get_roi(image: Mat):
     left_bottom = [10, height]
     right_bottom = [width-10, height]
     left_top = [30, ROI_TOP_VERT]
-    right_top = [0, ROI_TOP_VERT]
+    right_top = [width, ROI_TOP_VERT]
     pts = np.array([left_bottom, right_bottom, right_top, left_top], np.int32)
     pts = pts.reshape((-1, 1, 2))
 
