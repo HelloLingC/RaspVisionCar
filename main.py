@@ -59,7 +59,7 @@ def get_roi(image: Mat):
     mask = np.zeros(image.shape[:2], dtype=np.uint8)
 
     # Define trapezoid points  左下 右下 右上 左上
-    left_bottom = [10, height]
+    left_bottom = [0, height]
     right_bottom = [width, height]
     left_top = [30, ROI_TOP_VERT]
     right_top = [width, ROI_TOP_VERT]
@@ -207,16 +207,25 @@ def main():
         cv2.createTrackbar("V Upper", "Video Trackbar", 255, 255, nothing)
 
     try:
+        times = 0;
         while not shutdown_flag.is_set():
             ret, frame = cap.read()
             if not ret:
                 break
+            
+            
             frame = cv2.resize(frame, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
             if config.RECORD_VIDEO:
                 out.write(frame)
-            
-            handle_one_frame(frame)
+
+            if times >= 3:
+                times = 0;
+                handle_one_frame(frame)
+            else:
+                server.http_server.output.write(frame.tobytes())
+
+            times +=1;
 
             # 按'q'退出
             if cv2.waitKey(1) & 0xFF == ord('q'):
