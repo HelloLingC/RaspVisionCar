@@ -1,4 +1,6 @@
 from dotenv import load_dotenv
+
+from vision import curve_detector
 load_dotenv()  # 必须在所有导入之前加载 .env 文件
 
 import cv2
@@ -46,9 +48,14 @@ def get_yellow_mask(frame):
 
     mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
-    kernel = np.ones((5, 5), np.uint8)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)  # 去噪点
-    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel) # 填补空洞
+    # kernel = np.ones((5, 5), np.uint8)
+    # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)  # 去噪点
+    # mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel) # 填补空洞
+
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    mask = cv2.dilate(mask, kernel, iterations=1)
+    mask = cv2.erode(mask, kernel, iterations=1)
+
     # mask = cv2.medianBlur(mask, 9)  # 中值滤波
     return mask
 
@@ -80,6 +87,8 @@ def get_roi(image: Mat):
 找出当前行左右赛道的边缘点 → 取两者中点 → 逐层向上平滑跟踪中线 → 得出最终中线。
 """
 def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
+    mid_points = np.empty((0, 2), int)
+
     half_width= follow.shape[1] // 2
     half = half_width  # 从下往上扫描赛道,最下端取图片中线为分割线
     scan_times = 0
@@ -98,21 +107,23 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
             right = min(follow.shape[1],half+half_width)  # 取图片右边界
         else:
             right = np.average(np.where(mask[y][half:follow.shape[1]] == 255)) + half  # 计算分割线右端平均位置
- 
-        mid = (left + right) // 2  # 计算拟合中点
-        half = int(mid)  # 递归,从下往上确定拟合中点
-        follow[y, int(mid)] = 255  # 画出每行中点轨迹
 
+        mid = (left + right) // 2  # 计算拟合中点
+        if(mid == 2 * half):
+            follow[y, int(mid)] = 0;
+        else:
+            new_point = np.array([y, int(mid)])
+            mid_points = np.vstack([mid_points, new_point])
+            follow[y, int(mid)] = 255  # 画出每行中点轨迹
+
+        half = int(mid)  # 递归,从下往上确定拟合中点
+        
         # print(f"y: {y}, mid: {mid}")
  
-        if y == 100:  # 从指定高度取中线位置，for error calculation
-            mid_output = int(mid)
- 
-    cv2.circle(follow, (mid_output, 400), 5, 255, -1)  # opencv为(x,y),画出指定提取中点
- 
-    error = follow.shape[1] // 2 - mid_output  # 计算图片中点与指定提取中点的误差
- 
-    return follow, error  # error为正数右转,为负数左转
+    curveture = curve_detector.CurveDetector()
+    curv, direction = curveture.calc_curve(mid_points)
+    print(f"{curv} : {direction}")
+    return follow, 0  # error为正数右转,为负数左转
 
 def handle_one_frame(frame: Mat):
     # TODO: Add light detection
