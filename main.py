@@ -68,7 +68,7 @@ def get_roi(image: Mat):
     # Define trapezoid points  左下 右下 右上 左上
     left_bottom = [0, height]
     right_bottom = [width, height]
-    left_top = [30, ROI_TOP_VERT]
+    left_top = [0, ROI_TOP_VERT]
     right_top = [width, ROI_TOP_VERT]
     pts = np.array([left_bottom, right_bottom, right_top, left_top], np.int32)
     pts = pts.reshape((-1, 1, 2))
@@ -135,7 +135,7 @@ def handle_one_frame(frame: Mat):
 
     yellow_mask = get_yellow_mask(roi)
 
-    edges = cv2.Canny(yellow_mask, 100, 150)
+    edges = cv2.Canny(yellow_mask, 50, 100)
     # lines = cv2.HoughLinesP(
     #     edges,
     #     rho=1,
