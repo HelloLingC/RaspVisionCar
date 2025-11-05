@@ -1,7 +1,5 @@
 import os
 
-DEBUG_LEFT_MARGIN = 20
-
 # 0: Don't Output 1: Output for ControlPanel, 2: Output with cs2.imshow() 
 FRAME_OUTPUT_METHOD = int(os.getenv("FRAME_OUTPUT_METHOD", 1))
 

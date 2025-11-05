@@ -109,7 +109,7 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
             right = np.average(np.where(mask[y][half:follow.shape[1]] == 255)) + half  # 计算分割线右端平均位置
 
         mid = (left + right) // 2  # 计算拟合中点
-        if(mid == 2 * half):
+        if(mid == 2 * half): # 左右两边都无赛道
             follow[y, int(mid)] = 0;
         else:
             new_point = np.array([y, int(mid)])
@@ -122,8 +122,8 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
  
     curveture = curve_detector.CurveDetector()
     curv, direction = curveture.calc_curve(mid_points)
-    print(f"{curv} : {direction}")
-    return follow, 0  # error为正数右转,为负数左转
+    # print(f"{curv} : {direction}")
+    return follow, curv, direction  # error为正数右转,为负数左转
 
 def handle_one_frame(frame: Mat):
     # TODO: Add light detection
@@ -157,10 +157,12 @@ def handle_one_frame(frame: Mat):
     # Draw ROI region
     cv2.polylines(frame, [pts], isClosed=True, color=(255, 0, 55), thickness=1)
 
-    follow, error = mid(frame, edges)
-    cv2.putText(frame, f"Turn: {error}", (config.DEBUG_LEFT_MARGIN, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(155,55,0), 2)
+    follow, curv, direction = mid(frame, edges)
 
-    motor.get_motor_controller().send_turn_angle(error)
+    cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
+    cv2.putText(frame, f"curv: {curv}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
+
+    motor.get_motor_controller().send_turn_angle(0)
 
     if(config.FRAME_OUTPUT_METHOD == 1):
         success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
