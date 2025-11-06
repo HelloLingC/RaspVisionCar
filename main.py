@@ -165,7 +165,7 @@ def handle_one_frame(frame: Mat):
         direction = "right"
 
     cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
-    cv2.putText(frame, f"error: {error}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
+    cv2.putText(frame, f"error: {round(error)}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
 
     motor.get_motor_controller().send_turn_angle(0)
 

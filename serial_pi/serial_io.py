@@ -229,7 +229,7 @@ class STM32SerialIO:
             )
 
             # 尝试解析数据
-            data_str = data.decode('utf-8')
+            data_str = data.decode('ascii')
             # print(f"收到数据: {data_str}")
 
             # 添加到队列
