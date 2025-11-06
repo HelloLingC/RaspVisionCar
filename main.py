@@ -200,8 +200,8 @@ def main():
         # 启动服务器
         server.start_servers()
     
-    # cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture("/Users/lingc/Documents/output1.avi")
+    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture("/Users/lingc/Documents/output1.avi")
     # cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
     # cap.set(cv2.CAP_PROP_CONTRAST, 0.6)
     # cap.set(cv2.CAP_PROP_SATURATION, 3)
