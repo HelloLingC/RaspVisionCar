@@ -220,9 +220,6 @@ def main():
         cv2.createTrackbar("V Lower", "Video Trackbar", 120, 255, nothing)
         cv2.createTrackbar("V Upper", "Video Trackbar", 255, 255, nothing)
 
-    target_fps = 30
-    frame_delay = 1.0 / target_fps 
-
     try:
         times = 0;
         while not shutdown_flag.is_set():
