@@ -92,6 +92,7 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
     half_width= follow.shape[1] // 2
     half = half_width  # 从下往上扫描赛道,最下端取图片中线为分割线
     scan_times = 0
+    error = 0
     for y in range(follow.shape[0] - 1, -1, -1):
         scan_times += 1
         if scan_times > SCREEN_HEIGHT - ROI_TOP_VERT:
@@ -112,18 +113,17 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
         if(mid == 2 * half): # 左右两边都无赛道
             follow[y, int(mid)] = 0;
         else:
-            new_point = np.array([y, int(mid)])
-            mid_points = np.vstack([mid_points, new_point])
+            error += half_width - int(mid)
+            # new_point = np.array([y, int(mid)])
+            # mid_points = np.vstack([mid_points, new_point])
             follow[y, int(mid)] = 255  # 画出每行中点轨迹
 
         half = int(mid)  # 递归,从下往上确定拟合中点
         
         # print(f"y: {y}, mid: {mid}")
- 
-    curveture = curve_detector.CurveDetector()
-    curv, direction = curveture.calc_curve(mid_points)
+
     # print(f"{curv} : {direction}")
-    return follow, curv, direction  # error为正数右转,为负数左转
+    return follow, error / scan_times # error为正数右转,为负数左转
 
 def handle_one_frame(frame: Mat):
     # TODO: Add light detection
@@ -157,10 +157,15 @@ def handle_one_frame(frame: Mat):
     # Draw ROI region
     cv2.polylines(frame, [pts], isClosed=True, color=(255, 0, 55), thickness=1)
 
-    follow, curv, direction = mid(frame, edges)
+    follow, error = mid(frame, edges)
+
+    if error > 0:
+        direction = "left"
+    else:
+        direction = "right"
 
     cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
-    cv2.putText(frame, f"curv: {curv}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
+    cv2.putText(frame, f"error: {error}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
 
     motor.get_motor_controller().send_turn_angle(0)
 
@@ -173,8 +178,6 @@ def handle_one_frame(frame: Mat):
         cv2.imshow("Track Line", yellow_mask)
 
 shutdown_flag = threading.Event()
-
-
 
 def signal_handler(signum, frame):
     """信号处理器 for Ctrl+C"""
@@ -196,10 +199,9 @@ def main():
 
         # 启动服务器
         server.start_servers()
-
     
-    cap = cv2.VideoCapture(0)
-    # cap = cv2.VideoCapture("test/1.mp4")
+    # cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture("/Users/lingc/Documents/output1.avi")
     # cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
     # cap.set(cv2.CAP_PROP_CONTRAST, 0.6)
     # cap.set(cv2.CAP_PROP_SATURATION, 3)
@@ -217,6 +219,9 @@ def main():
         cv2.createTrackbar("S Upper", "Video Trackbar", 255, 255, nothing)
         cv2.createTrackbar("V Lower", "Video Trackbar", 120, 255, nothing)
         cv2.createTrackbar("V Upper", "Video Trackbar", 255, 255, nothing)
+
+    target_fps = 30
+    frame_delay = 1.0 / target_fps 
 
     try:
         times = 0;

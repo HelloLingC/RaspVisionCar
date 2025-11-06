@@ -18,7 +18,7 @@ class Motor_Controller:
             # # 记录发送时间戳
             # self._last_turn_send_ts = time.monotonic()
             if(config.ENABLE_TURN_ANGLE_UPDATE):
-                return get_stm32_io().send_command(f'ta:{angle}\n')
+                return get_stm32_io().send_command(f'cv:{angle}\n')
             else:
                 pass
                 # print(f"Turn angle update is disabled, angle: {angle}")
