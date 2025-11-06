@@ -163,11 +163,13 @@ def handle_one_frame(frame: Mat):
         direction = "left"
     else:
         direction = "right"
+    
+    # error = round(error)
 
     cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
-    cv2.putText(frame, f"error: {round(error)}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
+    cv2.putText(frame, f"error: {error}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
 
-    motor.get_motor_controller().send_turn_angle(0)
+    motor.get_motor_controller().send_turn_angle(error)
 
     if(config.FRAME_OUTPUT_METHOD == 1):
         success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
