@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from vision import curve_detector
+from vision import curve_detector, light_detect
 load_dotenv()  # 必须在所有导入之前加载 .env 文件
 
 import cv2
@@ -87,8 +87,6 @@ def get_roi(image: Mat):
 找出当前行左右赛道的边缘点 → 取两者中点 → 逐层向上平滑跟踪中线 → 得出最终中线。
 """
 def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
-    mid_points = np.empty((0, 2), int)
-
     half_width= follow.shape[1] // 2
     half = half_width  # 从下往上扫描赛道,最下端取图片中线为分割线
     scan_times = 0
@@ -125,10 +123,7 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
     # print(f"{curv} : {direction}")
     return follow, error / scan_times # error为正数右转,为负数左转
 
-def handle_one_frame(frame: Mat):
-    # TODO: Add light detection
-    # light_detect.handle_lights(frame)
-
+def handle_one_frame(frame: Mat) -> Mat:
     roi, pts = get_roi(frame)
     # roi = frame
     roi = cv2.GaussianBlur(roi, (5, 5), 0)
@@ -166,18 +161,7 @@ def handle_one_frame(frame: Mat):
     
     # error = round(error)
 
-    cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
-    cv2.putText(frame, f"error: {error}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
-
-    motor.get_motor_controller().send_turn_angle(error)
-
-    if(config.FRAME_OUTPUT_METHOD == 1):
-        success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
-        if success:
-            server.http_server.output.write(jpeg_data.tobytes())
-    elif(config.FRAME_OUTPUT_METHOD == 2):
-        cv2.imshow("Original", frame)
-        cv2.imshow("Track Line", yellow_mask)
+    return direction, error
 
 shutdown_flag = threading.Event()
 
@@ -231,10 +215,46 @@ def main():
                     
             frame = cv2.resize(frame, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+            redCount, greenCount = light_detect.handle_lights(frame)
+            direction, error = handle_one_frame(frame)
+
+            signal = -1
+            signal_cmd = ""
+
+            if redCount == 0 and greenCount == 0:
+                cv2.putText(frame, "lights out", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+            elif redCount > greenCount and redCount > 500: # threhold
+                signal = 0
+            elif redCount < greenCount and greenCount > 500:
+                signal = 1
+            else:
+                cv2.putText(frame, f"slight {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+
+            if signal != -1: 
+                # it's vaild, we should send the signal to the Slave
+                signal_cmd = f"sig:{signal}"
+
+            command = f"cv:{error},{signal_cmd}\n"
+            motor.get_motor_controller().send_command(command)
+
+            if signal == 0:
+                cv2.putText(frame, f"red light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1)
+            elif signal == 1:
+                cv2.putText(frame, f"green light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1)            
+ 
+            cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
+            cv2.putText(frame, f"error: {error}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
+
             if config.RECORD_VIDEO:
                 out.write(frame)
 
-            handle_one_frame(frame)
+            if(config.FRAME_OUTPUT_METHOD == 1):
+                success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
+                if success:
+                    server.http_server.output.write(jpeg_data.tobytes())
+            elif(config.FRAME_OUTPUT_METHOD == 2):
+                cv2.imshow("Original", frame)
+                # cv2.imshow("Track Line", yellow_mask)
 
             # 按'q'退出
             if cv2.waitKey(1) & 0xFF == ord('q'):

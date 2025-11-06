@@ -5,6 +5,13 @@ from serial_pi.serial_io import get_stm32_io
 
 class Motor_Controller:
 
+    def send_command(self, cmd: str):
+        try:
+            if(config.ENABLE_TURN_ANGLE_UPDATE):
+                get_stm32_io().send_command(cmd)
+        except Exception as e:
+            pass
+
     def send_turn_angle(self, angle: int):
         try:
             # 限速：两次发送之间至少间隔 50ms
@@ -23,7 +30,6 @@ class Motor_Controller:
                 pass
                 # print(f"Turn angle update is disabled, angle: {angle}")
         except Exception as e:
-            # print(f"发送转向角度失败: {e}")
             print(f"Send turn angle failed: {e}")
 
     def set_motor_speed(self, left_speed: int, right_speed: int) -> Dict[str, Any]:
@@ -41,13 +47,6 @@ class Motor_Controller:
         if stm32_io:
             return stm32_io.send_command(f'LS:{left_speed},RS:{right_speed}\n')
         return None
-    
-    def set_pid_params(self, direction: str, kp: float, ki: float, kd: float):
-        stm32_io = get_stm32_io()
-        if stm32_io:
-            return stm32_io.send_command(f'PID:{direction}:{kp}:{ki}:{kd}\n')
-        return None
-
 
 motor_controller = Motor_Controller()
 

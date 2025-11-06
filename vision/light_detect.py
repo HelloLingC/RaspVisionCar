@@ -129,7 +129,7 @@ def processImgG(src, frame):
     
     return area
 
-def handle_lights(frame: cv2.Mat):
+def handle_lights(frame: cv2.Mat) -> cv2.Mat:
     global isFirstDetectedR, isFirstDetectedG, lastTrackBoxR, lastTrackBoxG, lastTrackNumR, lastTrackNumG
     
     redCount = 0
@@ -139,13 +139,6 @@ def handle_lights(frame: cv2.Mat):
     a = 0.3
     b = (1 - a) * 125
 
-    # 导入视频的路径
-    capture = cv2.VideoCapture("test/lights.mp4")
-    if not capture.isOpened():
-        print("Start device failed!\n")
-        return -1
-
-            
     # 调整亮度
     img = frame.copy()
     img = img.astype(np.float32)
@@ -177,17 +170,12 @@ def handle_lights(frame: cv2.Mat):
     imgGreen = cv2.dilate(imgGreen, kernel, iterations=1)
     imgGreen = cv2.erode(imgGreen, np.ones((1, 1), np.uint8), iterations=1)
 
+    # We temporarily disable red light detection
+    # redCount = 0
     redCount = processImgR(imgRed, frame)
     greenCount = processImgG(imgGreen, frame)
 
-    if redCount == 0 and greenCount == 0:
-        cv2.putText(frame, "lights out", (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-    elif redCount > greenCount and redCount > 500: # threhold
-        cv2.putText(frame, f"red light {redCount}/{greenCount}", (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-    elif redCount < greenCount and greenCount > 500:
-        cv2.putText(frame, f"green light {redCount}/{greenCount}", (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-    else:
-        cv2.putText(frame, f"slight {redCount}/{greenCount}", (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+    return redCount, greenCount
 
 if __name__ == "__main__":
     pass
