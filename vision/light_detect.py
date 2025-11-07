@@ -164,7 +164,7 @@ def handle_lights(frame: cv2.Mat) -> cv2.Mat:
     imgGreen[(Cr_channel > 95) & (Cr_channel < 110)] = 255
 
     # 膨胀和腐蚀
-    kernel = np.ones((15, 15), np.uint8)
+    kernel = np.ones((7, 7), np.uint8)
     imgRed = cv2.dilate(imgRed, kernel, iterations=1)
     imgRed = cv2.erode(imgRed, np.ones((1, 1), np.uint8), iterations=1)
     imgGreen = cv2.dilate(imgGreen, kernel, iterations=1)
