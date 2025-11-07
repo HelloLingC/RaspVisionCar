@@ -141,9 +141,9 @@ def handle_lights(frame: cv2.Mat) -> cv2.Mat:
 
     # 调整亮度
     img = frame.copy()
-    # img = img.astype(np.float32)
-    # img = a * img + b
-    # img = np.clip(img, 0, 255).astype(np.uint8)
+    img = img.astype(np.float32)
+    img = a * img + b
+    img = np.clip(img, 0, 255).astype(np.uint8)
 
     # 转换为YCrCb颜色空间
     imgYCrCb = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
