@@ -208,15 +208,13 @@ def main():
             if not ret:
                 break
                     
-            frame = cv2.resize(frame, (SCREEN_WIDTH, SCREEN_HEIGHT))
+            r_frame = cv2.resize(frame, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-            direction, error = handle_one_frame(frame)
+            direction, error = handle_one_frame(r_frame)
             redCount, greenCount = light_detect.handle_lights(frame)
 
             signal_v = -1
             signal_cmd = ""
-
-            cv2.GaussianBlur(frame, (7,7), 0)
 
             if redCount == 0 and greenCount == 0:
                 cv2.putText(frame, "lights out", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
@@ -234,10 +232,10 @@ def main():
             command = f"cv:{error},{signal_cmd}\n"
             motor.get_motor_controller().send_command(command)
 
-            if signal_v == 0:
-                cv2.putText(frame, f"red light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1)
-            elif signal_v == 1:
-                cv2.putText(frame, f"green light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1)            
+            # if signal_v == 0:
+            #     cv2.putText(frame, f"red light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1)
+            # elif signal_v == 1:
+            #     cv2.putText(frame, f"green light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1)            
  
             cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
             cv2.putText(frame, f"error: {error}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
