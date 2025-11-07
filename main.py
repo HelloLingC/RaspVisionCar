@@ -232,9 +232,9 @@ def main():
             else:
                 cv2.putText(frame, f"slight {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
 
-            if signal_v != -1: 
-                # it's vaild, we should send the signal to the Slave
-                signal_cmd = f"sig:{signal}"
+            # if signal_v != -1: 
+            #     # it's vaild, we should send the signal to the Slave
+            #     signal_cmd = f"sig:{signal}"
 
             command = f"cv:{error},{signal_cmd}\n"
             motor.get_motor_controller().send_command(command)
