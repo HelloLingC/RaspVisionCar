@@ -87,6 +87,8 @@ def get_roi(image: Mat):
 找出当前行左右赛道的边缘点 → 取两者中点 → 逐层向上平滑跟踪中线 → 得出最终中线。
 """
 def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
+    mid_points = np.empty((0, 2), int)
+
     half_width= follow.shape[1] // 2
     half = half_width  # 从下往上扫描赛道,最下端取图片中线为分割线
     scan_times = 0
@@ -182,7 +184,7 @@ def main():
             print("STM32 Serial IO initialization failed")
             exit(1)
         print("STM32 Serial IO initialized")
-
+        
         # 启动服务器
         server.start_servers()
     
@@ -218,28 +220,28 @@ def main():
             redCount, greenCount = light_detect.handle_lights(frame)
             direction, error = handle_one_frame(frame)
 
-            signal = -1
+            signal_v = -1
             signal_cmd = ""
 
             if redCount == 0 and greenCount == 0:
                 cv2.putText(frame, "lights out", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
             elif redCount > greenCount and redCount > 500: # threhold
-                signal = 0
+                signal_v = 0
             elif redCount < greenCount and greenCount > 500:
-                signal = 1
+                signal_v = 1
             else:
                 cv2.putText(frame, f"slight {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
 
-            if signal != -1: 
+            if signal_v != -1: 
                 # it's vaild, we should send the signal to the Slave
                 signal_cmd = f"sig:{signal}"
 
             command = f"cv:{error},{signal_cmd}\n"
             motor.get_motor_controller().send_command(command)
 
-            if signal == 0:
+            if signal_v == 0:
                 cv2.putText(frame, f"red light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1)
-            elif signal == 1:
+            elif signal_v == 1:
                 cv2.putText(frame, f"green light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1)            
  
             cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
