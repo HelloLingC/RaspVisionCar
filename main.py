@@ -92,26 +92,32 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
     half_width= follow.shape[1] // 2
     half = half_width  # 从下往上扫描赛道,最下端取图片中线为分割线
     scan_times = 0
+    invaild_times = 0;
     error = 0
     for y in range(follow.shape[0] - 1, -1, -1):
+        have_left_lane = True
+        have_right_lane = True
         scan_times += 1
         if scan_times > SCREEN_HEIGHT - ROI_TOP_VERT:
             break
         # 加入分割线左右各半张图片的宽度作为约束,减小邻近赛道的干扰
         if (mask[y][max(0,half-half_width):half] == np.zeros_like(mask[y][max(0,half-half_width):half])).all():
             # 分割线左端无赛道
+            have_left_lane = False
             left = max(0,half-half_width)  # 取图片左边界
         else:
             left = np.average(np.where(mask[y][0:half] == 255))  # 计算分割线左端平均位置
         if (mask[y][half:min(follow.shape[1],half+half_width)] == np.zeros_like(mask[y][half:min(follow.shape[1],half+half_width)])).all():
             # 分割线右端无赛道
+            have_right_lane = False
             right = min(follow.shape[1],half+half_width)  # 取图片右边界
         else:
             right = np.average(np.where(mask[y][half:follow.shape[1]] == 255)) + half  # 计算分割线右端平均位置
 
         mid = (left + right) // 2  # 计算拟合中点
-        if(mid == 2 * half): # 左右两边都无赛道
-            follow[y, int(mid)] = 0;
+        if not have_right_lane and not have_left_lane: # 左右两边都无赛道
+            # follow[y, int(mid)] = 0;
+            invaild_times += 1
         else:
             error += half_width - int(mid)
             # new_point = np.array([y, int(mid)])
@@ -120,10 +126,10 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
 
         half = int(mid)  # 递归,从下往上确定拟合中点
         
-        # print(f"y: {y}, mid: {mid}")
+    # print(f"invaild: {scan_times - invaild_times}")
 
     # print(f"{curv} : {direction}")
-    return follow, error / scan_times # error为正数右转,为负数左转
+    return error / (scan_times - invaild_times) # error为正数右转,为负数左转
 
 def handle_one_frame(frame: Mat) -> Mat:
     roi, pts = get_roi(frame)
@@ -154,7 +160,7 @@ def handle_one_frame(frame: Mat) -> Mat:
     # Draw ROI region
     cv2.polylines(frame, [pts], isClosed=True, color=(255, 0, 55), thickness=1)
 
-    follow, error = mid(frame, edges)
+    error = mid(frame, edges)
 
     if error > 0:
         direction = "left"
