@@ -171,8 +171,8 @@ def handle_lights(frame: cv2.Mat) -> cv2.Mat:
     imgGreen = cv2.erode(imgGreen, np.ones((1, 1), np.uint8), iterations=1)
 
     # We temporarily disable red light detection
-    # redCount = 0
-    redCount = processImgR(imgRed, frame)
+    redCount = 0
+    # redCount = processImgR(imgRed, frame)
     greenCount = processImgG(imgGreen, frame)
 
     return redCount, greenCount
