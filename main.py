@@ -216,6 +216,8 @@ def main():
             signal_v = -1
             signal_cmd = ""
 
+            cv2.GaussianBlur(frame, (7,7), 0)
+
             if redCount == 0 and greenCount == 0:
                 cv2.putText(frame, "lights out", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
             elif redCount > greenCount and redCount > 500: # threhold

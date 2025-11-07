@@ -141,6 +141,7 @@ def handle_lights(frame: cv2.Mat) -> cv2.Mat:
 
     # 调整亮度
     img = frame.copy()
+    cv2.GaussianBlur(img, (7,7), 0)
     # img = img.astype(np.float32)
     # img = a * img + b
     # img = np.clip(img, 0, 255).astype(np.uint8)
