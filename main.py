@@ -229,7 +229,7 @@ def main():
                 # it's vaild, we should send the signal to the Slave
                 signal_cmd = f"sig:{signal}"
 
-            command = f"cv:{error}\n"
+            command = f"cv:{error},{signal_cmd}\n"
             motor.get_motor_controller().send_command(command)
 
             if signal_v == 0:
