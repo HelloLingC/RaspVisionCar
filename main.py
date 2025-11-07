@@ -26,11 +26,7 @@ def nothing(x):
     pass
 
 # HSV 提取黄色赛道线
-def get_yellow_mask(frame):
-    frame = cv2.GaussianBlur(frame, (7, 7), 0)
-
-    # BGR to HSV
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+def get_yellow_mask(hsv):
     
     # 黄色的HSV范围
     if(config.SHOW_TRACKBAR):
@@ -132,27 +128,16 @@ def mid(follow: Mat, mask: Mat) -> tuple[Mat, int]:
     return error / (scan_times - invaild_times) # error为正数右转,为负数左转
 
 def handle_one_frame(frame: Mat) -> Mat:
-    roi, pts = get_roi(frame)
-    # roi = frame
-    roi = cv2.GaussianBlur(roi, (5, 5), 0)
+    # BGR to HSV
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # 高斯模糊  
+    hsv = cv2.GaussianBlur(hsv, (7, 7), 0)
+
+    roi, pts = get_roi(hsv)
 
     yellow_mask = get_yellow_mask(roi)
 
     edges = cv2.Canny(yellow_mask, 50, 100)
-    # lines = cv2.HoughLinesP(
-    #     edges,
-    #     rho=1,
-    #     theta=np.pi/180,
-    #     threshold=20,
-    #     minLineLength=15,
-    #     maxLineGap=25
-    # )
-
-    # if lines is not None:
-    #     for line in lines:
-    #         x1, y1, x2, y2 = line[0]
-    #         cv2.line(frame, (x1, y1), (x2, y2), (0, 0, 255), 3)
-
 
     mask = edges != 0
     frame[mask] = [0, 0, 255]
