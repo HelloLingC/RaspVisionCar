@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from vision import curve_detector, light_detect
+from vision import curve_detector, light_detect2
 load_dotenv()  # 必须在所有导入之前加载 .env 文件
 
 import cv2
@@ -132,6 +132,8 @@ def handle_one_frame(frame: Mat) -> Mat:
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     # 高斯模糊  
     hsv = cv2.GaussianBlur(hsv, (7, 7), 0)
+
+    light_detect2.handle(frame, hsv)
 
     roi, pts = get_roi(hsv)
 
