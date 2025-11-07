@@ -5,6 +5,11 @@ def handle(frame, hsv):
     lower_green = np.array([35, 50, 50])
     upper_green = np.array([85, 255, 255])
     mask = cv2.inRange(hsv, lower_green, upper_green)
+
+    kernel = np.ones((5,5), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+
     circles = cv2.HoughCircles(
         mask, 
         cv2.HOUGH_GRADIENT, 
