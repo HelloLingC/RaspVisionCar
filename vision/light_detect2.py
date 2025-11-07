@@ -16,9 +16,9 @@ def handle(frame, hsv):
         dp=1, 
         minDist=10,
         param1=50, 
-        param2=10,   # param2 越小越容易检测到小圆
-        minRadius=3, 
-        maxRadius=15
+        param2=20,   # param2 越小越容易检测到小圆
+        minRadius=10, 
+        maxRadius=100
     )
     if circles is not None:
         circles = np.uint16(np.around(circles))
