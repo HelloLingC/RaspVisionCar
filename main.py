@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from vision import curve_detector, light_detect2
+from vision import curve_detector, light_detect2, light_detect
 load_dotenv()  # 必须在所有导入之前加载 .env 文件
 
 import cv2
@@ -133,7 +133,7 @@ def handle_one_frame(frame: Mat) -> Mat:
     # 高斯模糊  
     hsv = cv2.GaussianBlur(hsv, (7, 7), 0)
 
-    light_detect2.handle(frame, hsv)
+    # light_detect2.handle(frame, hsv)
 
     roi, pts = get_roi(hsv)
 
@@ -211,30 +211,31 @@ def main():
             frame = cv2.resize(frame, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
             direction, error = handle_one_frame(frame)
+            redCount, greenCount = light_detect.handle_lights(frame)
 
             signal_v = -1
             signal_cmd = ""
 
-            # if redCount == 0 and greenCount == 0:
-            #     cv2.putText(frame, "lights out", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
-            # elif redCount > greenCount and redCount > 500: # threhold
-            #     signal_v = 0
-            # elif redCount < greenCount and greenCount > 500:
-            #     signal_v = 1
-            # else:
-            #     cv2.putText(frame, f"slight {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+            if redCount == 0 and greenCount == 0:
+                cv2.putText(frame, "lights out", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+            elif redCount > greenCount and redCount > 500: # threhold
+                signal_v = 0
+            elif redCount < greenCount and greenCount > 500:
+                signal_v = 1
+            else:
+                cv2.putText(frame, f"slight {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
 
-            # if signal_v != -1: 
-            #     # it's vaild, we should send the signal to the Slave
-            #     signal_cmd = f"sig:{signal}"
+            if signal_v != -1: 
+                # it's vaild, we should send the signal to the Slave
+                signal_cmd = f"sig:{signal}"
 
             command = f"cv:{error}\n"
             motor.get_motor_controller().send_command(command)
 
-            # if signal_v == 0:
-            #     cv2.putText(frame, f"red light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1)
-            # elif signal_v == 1:
-            #     cv2.putText(frame, f"green light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1)            
+            if signal_v == 0:
+                cv2.putText(frame, f"red light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1)
+            elif signal_v == 1:
+                cv2.putText(frame, f"green light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1)            
  
             cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
             cv2.putText(frame, f"error: {error}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
