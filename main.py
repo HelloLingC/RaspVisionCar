@@ -220,6 +220,8 @@ def main():
             redCount, greenCount = light_detect.handle_lights(frame)
             direction, error = handle_one_frame(frame)
 
+            motor.get_motor_controller().send_turn_angle(error)
+
             signal_v = -1
             signal_cmd = ""
 
@@ -237,7 +239,7 @@ def main():
             #     signal_cmd = f"sig:{signal}"
 
             command = f"cv:{error},{signal_cmd}\n"
-            motor.get_motor_controller().send_command(command)
+            # motor.get_motor_controller().send_command(command)
 
             if signal_v == 0:
                 cv2.putText(frame, f"red light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1)
