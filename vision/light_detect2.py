@@ -2,8 +2,8 @@ import numpy as np
 import cv2
 
 def handle(frame, hsv):
-    lower_green = np.array([40, 60, 60])
-    upper_green = np.array([90, 255, 255])
+    lower_green = np.array([35, 50, 50])
+    upper_green = np.array([85, 255, 255])
     mask = cv2.inRange(hsv, lower_green, upper_green)
     circles = cv2.HoughCircles(
         mask, 
