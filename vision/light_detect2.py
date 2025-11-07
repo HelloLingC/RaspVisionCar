@@ -15,8 +15,8 @@ def handle(frame, hsv):
         cv2.HOUGH_GRADIENT, 
         dp=1, 
         minDist=10,
-        param1=20, 
-        param2=5,   # param2 越小越容易检测到小圆
+        param1=30, 
+        param2=10,   # param2 越小越容易检测到小圆
         minRadius=10, 
         maxRadius=30
     )
