@@ -15,12 +15,21 @@ def handle(frame, hsv):
         cv2.HOUGH_GRADIENT, 
         dp=1, 
         minDist=10,
-        param1=40, 
+        param1=30, 
         param2=10,   # param2 越小越容易检测到小圆
         minRadius=10, 
         maxRadius=30
     )
+    # if circles is not None:
+    #     circles = np.uint16(np.around(circles))
+    #     for (x, y, r) in circles[0, :]:
+    #         cv2.circle(frame, (x, y), r, (0, 255, 0), 2)
+
     if circles is not None:
-        circles = np.uint16(np.around(circles))
-        for (x, y, r) in circles[0, :]:
+        circles = np.round(circles[0, :]).astype("int")
+        for (x, y, r) in circles:
+            # 圆形
             cv2.circle(frame, (x, y), r, (0, 255, 0), 2)
+            # 圆心
+            cv2.circle(frame, (x, y), 2, (0, 0, 255), 3)
+            # print(f"圆: 中心({x}, {y}), 半径{r}")
