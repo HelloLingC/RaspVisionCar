@@ -362,7 +362,7 @@ class STM32SerialIO:
             except queue.Empty:
                 break
 
-    def _send_raw_command(self, command: str, expect_response: bool = False) -> Optional[str]:
+    def _send_raw_command(self, command_bytes: bytes) -> Optional[str]:
         """
         发送原始命令到STM32
 
@@ -380,7 +380,6 @@ class STM32SerialIO:
         with self.lock:
             try:
                 # 发送命令
-                command_bytes = command.encode('ascii')
                 # if(len(command_bytes) < 16):
                 #     command_bytes = command_bytes.ljust(16, b'\n')
                 
@@ -390,16 +389,6 @@ class STM32SerialIO:
                 # self.stats['commands_sent'] += 1
                 # self.stats['bytes_sent'] += len(command_bytes)
                 # self.stats['last_command_time'] = time.time()
-
-                if expect_response:
-                    # 等待响应
-                    start_time = time.time()
-                    while time.time() - start_time < self.timeout:
-                        data = self.get_latest_data("response", timeout=0.1)
-                        if data:
-                            return data.parsed_data
-                    return None
-                
                 return None
                 
             except Exception as e:
@@ -407,10 +396,23 @@ class STM32SerialIO:
                 self.stats['errors'] += 1
                 return None
 
-    def send_command(self, command: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def send_command(self, command: str):
         """
+        加入帧头和帧尾
         """
-        return self._send_raw_command(command, expect_response=False)
+        data = bytes(command, "ascii")
+
+        header = 0xAA
+        length = len(data) + 3 # contains header, len and checksum
+        
+        # 计算校验和：header + length + 所有data字节的和
+        checksum = header + length
+        for byte in data:
+            checksum += byte
+        checksum = checksum & 0xFF  # 取最后一字节
+
+        packet = bytes([header, length]) + data + bytes([checksum])
+        self._send_raw_command(packet)
    
 # 全局STM32控制器实例
 _stm32_io: Optional[STM32SerialIO] = None

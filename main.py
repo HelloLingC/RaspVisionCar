@@ -168,15 +168,15 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 def main():
-    if(config.FRAME_OUTPUT_METHOD == 1):
-        # 注册信号处理器
-        signal.signal(signal.SIGINT, signal_handler)
-        signal.signal(signal.SIGTERM, signal_handler)
-
+    if(config.FRAME_OUTPUT_METHOD == 0 or config.FRAME_OUTPUT_METHOD == 1):
         if not serial_io.init_stm32_io():
             print("STM32 Serial IO initialization failed")
             exit(1)
         print("STM32 Serial IO initialized")
+    if(config.FRAME_OUTPUT_METHOD == 1):
+        # 注册信号处理器
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
         
         # 启动服务器
         server.start_servers()
