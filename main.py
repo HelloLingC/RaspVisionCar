@@ -244,7 +244,7 @@ def main():
                 out.write(frame)
 
             if(config.FRAME_OUTPUT_METHOD == 1):
-                success, jpeg_data = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
+                success, jpeg_data = cv2.imencode('.jpeg', r_frame, [cv2.IMWRITE_JPEG_QUALITY, 90])
                 if success:
                     server.http_server.output.write(jpeg_data.tobytes())
             elif(config.FRAME_OUTPUT_METHOD == 2):
