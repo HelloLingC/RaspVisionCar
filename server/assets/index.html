@@ -104,7 +104,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            padding: 20px;
+            padding: 0.6rem;
         }
 
         .video-section,
@@ -456,6 +456,7 @@
             text-align: center;
             background: linear-gradient(90deg, #6a0dad, #b84cff, #ff66ff);
             background-size: 200%;
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: glow-move 4s ease-in-out infinite;
@@ -480,8 +481,9 @@
         }
 
 
-        @media (max-width: 768px) {
+        @media (max-width: 1000px) {
             .main-content {
+                display: block;
                 grid-template-columns: 1fr;
             }
 

@@ -40,7 +40,7 @@ def get_yellow_mask(hsv):
         upper_yellow = np.array([h_upper, s_upper, v_upper])
     else:
         lower_yellow = np.array([10, 40, 120])
-        upper_yellow = np.array([40, 255, 255])
+        upper_yellow = np.array([38, 255, 255])
 
     mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
