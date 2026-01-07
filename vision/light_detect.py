@@ -177,5 +177,38 @@ def handle_lights(frame: cv2.Mat) -> cv2.Mat:
 
     return redCount, greenCount
 
+def process_signal(frame: cv2.Mat, redCount: int, greenCount: int, threshold: int = 500) -> tuple[int, str]:
+    """
+    处理红绿灯信号，根据检测到的红色和绿色灯光数量确定信号值
+    
+    Args:
+        frame: 用于绘制状态文本的帧
+        redCount: 红色灯光检测数量
+        greenCount: 绿色灯光检测数量
+        threshold: 信号有效阈值，默认500
+    
+    Returns:
+        tuple[int, str]: (signal_v, signal_cmd)
+            signal_v: -1表示无效，0表示红灯，1表示绿灯
+            signal_cmd: 空字符串表示无效，否则为"sig:0"或"sig:1"
+    """
+    signal_v = -1
+    signal_cmd = ""
+
+    if redCount == 0 and greenCount == 0:
+        cv2.putText(frame, "lights out", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+    elif redCount > greenCount and redCount > threshold:  # threshold
+        signal_v = 0
+    elif redCount < greenCount and greenCount > threshold:
+        signal_v = 1
+    else:
+        cv2.putText(frame, f"slight {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+
+    if signal_v != -1:
+        # it's valid, we should send the signal to the Slave
+        signal_cmd = f"sig:{signal_v}"
+
+    return signal_v, signal_cmd
+
 if __name__ == "__main__":
     pass
