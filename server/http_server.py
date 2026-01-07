@@ -107,7 +107,8 @@ def stream():
         headers={
             'Age': '0',
             'Cache-Control': 'no-cache, private',
-            'Pragma': 'no-cache'
+            'Pragma': 'no-cache',
+            'Access-Control-Allow-Origin': '*'
         }
     )
 
