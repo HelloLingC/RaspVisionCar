@@ -1,6 +1,11 @@
 import os
 
-# 0: Don't Output 1: Output for ControlPanel, 2: Output with cs2.imshow() 
+SCREEN_WIDTH = int(os.getenv("SCREEN_WIDTH", 320))
+SCREEN_HEIGHT = int(os.getenv("SCREEN_HEIGHT", 240))
+
+OPENCV_DETECT_ON = int(os.getenv("OPENCV_DETECT_ON", 1))
+
+# 0: Don't Output 1: Output for ControlPanel, 2: Output with cs2.imshow()
 FRAME_OUTPUT_METHOD = int(os.getenv("FRAME_OUTPUT_METHOD", 1))
 VIDEO_INPUT_PATH = os.getenv("VIDEO_INPUT_PATH", "")
 

@@ -15,11 +15,6 @@ import serial_pi.serial_io as serial_io
 import serial_pi.motor as motor
 import config
 
-# SCREEN_WIDTH = 640
-# SCREEN_HEIGHT = 480
-SCREEN_WIDTH = 320
-SCREEN_HEIGHT = 240
-
 UPTIME_START_WHEN = 0
 
 def nothing(x):
@@ -57,7 +52,7 @@ def main():
     print(f"Camera actual FPS: {actual_fps}")
 
     if config.RECORD_VIDEO:
-        out = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'MJPG'), actual_fps, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        out = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'MJPG'), actual_fps, (config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
 
     if config.SHOW_TRACKBAR:
         cv2.namedWindow("Video Trackbar", cv2.WINDOW_NORMAL)
@@ -74,23 +69,25 @@ def main():
             if not ret:
                 break
 
-            r_frame = cv2.resize(frame, (SCREEN_WIDTH, SCREEN_HEIGHT))
+            r_frame = cv2.resize(frame, (config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
 
-            direction, error = track_line.handle_one_frame(r_frame, SCREEN_HEIGHT)
-            redCount, greenCount = light_detect.handle_lights(frame)
+            if config.OPENCV_DETECT_ON:
+                direction, error = track_line.handle_one_frame(r_frame, config.SCREEN_HEIGHT)
 
-            signal_v, signal_cmd = light_detect.process_signal(frame, redCount, greenCount)
+                redCount, greenCount = light_detect.handle_lights(frame)
 
-            command = f"cv:{error},{signal_cmd}\n"
-            motor.get_motor_controller().send_command(command)
+                signal_v, signal_cmd = light_detect.process_signal(frame, redCount, greenCount)
 
-            # if signal_v == 0:
-            #     cv2.putText(frame, f"red light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1)
-            # elif signal_v == 1:
-            #     cv2.putText(frame, f"green light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1)            
+                  # if signal_v == 0:
+                #     cv2.putText(frame, f"red light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1)
+                # elif signal_v == 1:
+                #     cv2.putText(frame, f"green light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1)            
 
-            cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
-            cv2.putText(frame, f"error: {error}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
+                command = f"cv:{error},{signal_cmd}\n"
+                motor.get_motor_controller().send_command(command)
+
+                cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
+                cv2.putText(frame, f"error: {error}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
 
             if config.RECORD_VIDEO:
                 out.write(frame)
