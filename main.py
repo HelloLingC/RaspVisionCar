@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from vision import curve_detector, light_detect2, light_detect, track_line
+from vision import light_detect, track_line
 load_dotenv()  # 必须在所有导入之前加载 .env 文件
 
 import cv2
