@@ -51,6 +51,8 @@ def main():
     actual_fps = cap.get(cv2.CAP_PROP_FPS)
     print(f"Camera actual FPS: {actual_fps}")
 
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+
     if config.RECORD_VIDEO:
         out = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'MJPG'), actual_fps, (config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
 
@@ -70,6 +72,24 @@ def main():
                 break
 
             r_frame = cv2.resize(frame, (config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+
+            if config.OPENCV_DETECT_ON:
+                direction, error = track_line.handle_one_frame(r_frame, config.SCREEN_HEIGHT)
+
+                redCount, greenCount = light_detect.handle_lights(frame)
+
+                signal_v, signal_cmd = light_detect.process_signal(frame, redCount, greenCount)
+
+                  # if signal_v == 0:
+                #     cv2.putText(frame, f"red light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1)
+                # elif signal_v == 1:
+                #     cv2.putText(frame, f"green light {redCount}/{greenCount}", (10, 42), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1)            
+
+                command = f"cv:{error},{signal_cmd}\n"
+                motor.get_motor_controller().send_command(command)
+
+                cv2.putText(frame, f"dir: {direction}", (10, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.4,(155,55,0), 1)
+                cv2.putText(frame, f"error: {error}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 30), 1)
 
             if config.RECORD_VIDEO:
                 out.write(frame)

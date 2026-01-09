@@ -1,7 +1,8 @@
 import os
 
-SCREEN_WIDTH = int(os.getenv("SCREEN_WIDTH", 320))
-SCREEN_HEIGHT = int(os.getenv("SCREEN_HEIGHT", 240))
+# or 320*240
+SCREEN_WIDTH = int(os.getenv("SCREEN_WIDTH", 640))
+SCREEN_HEIGHT = int(os.getenv("SCREEN_HEIGHT", 480))
 
 OPENCV_DETECT_ON = int(os.getenv("OPENCV_DETECT_ON", 1))
 
